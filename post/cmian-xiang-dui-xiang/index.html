@@ -1,0 +1,241 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>c++面向对象 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              c++面向对象
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>类：<br>
+1.类的定义<br>
+2.成员函数的定义<br>
+3.创建对象调用方法</p>
+<pre><code class="language-cpp">class student{
+    public:
+    int num;
+    private:
+    int name;
+}
+</code></pre>
+<p>类名：student<br>
+属性：num<br>
+public是公有，private是私有，公有是可以在其他类和主函数中访问修改，private是只能在类的内部进行访问<br>
+没有private的类相当于结构体<br>
+类被定义后就可以创建类的对象</p>
+<pre><code class="language-cpp">student a;
+</code></pre>
+<p>成员函数的重载：<br>
+不同的函数可能有相同的函数名，通过不同的输入参数来识别。</p>
+<pre><code class="language-cpp">class student{
+    public:
+    int num;
+    string name;
+    bool set(int a);
+    bool set(string s);
+}
+bool student::set(int a)
+{
+    num=a;
+    return true;
+}
+bool student::set(string s)
+{
+    name=s;
+    return true;
+}
+student a;
+a.set(10);
+a.set(&quot;ans&quot;)；
+</code></pre>
+<p>::可以不跟类名，表示全局变量</p>
+<pre><code class="language-cpp">int month;//全局变量
+int day;
+int year;
+void Set(int m,int d,int y)
+{
+    ::year=y; //给全局变量赋值，此处可省略
+    ::day=d;
+    ::month=m;
+}
+
+Class Tdate
+{
+    public:
+        void Set(int m,int d,int y) //成员函数
+        {
+            ::Set(m,d,y); //非成员函数
+        }//这个相当于在成员函数中执行非成员函数
+    private:
+        int month;
+        int day;
+        int year;
+}
+</code></pre>
+<p>类的简单赋值和结构体一样，可以用{}</p>
+<p>构造函数：本质上是对类定义的对象进行初始化。<br>
+构造函数名要和类名相同。</p>
+<pre><code class="language-cpp">class student{
+    public:
+    int num;
+    string name;
+   student();
+}
+student::student()
+{
+    num=1;
+    name=&quot;zs&quot;;
+}
+int main()
+{
+    student a;//a将会被自动赋值
+}
+</code></pre>
+<p>带参数的构造函数</p>
+<pre><code class="language-cpp">class student{
+    public:
+    int num;
+    string name;
+   student();
+   student(int a,string s);
+}
+student::student()
+{
+    num=1;
+    name=&quot;zs&quot;;
+}
+student::student(int a,string s)
+{
+    num=a;
+    name=s;
+}
+int main()
+{
+    student a;//a将会被自动赋值
+    student b(10,&quot;zs&quot;);
+}
+</code></pre>
+<p>析构函数<br>
+析构函数是运行delete的时候自动调用的函数，销毁内存</p>
+<pre><code class="language-cpp">student::~student()
+{
+    cout&lt;&lt;&quot;ok&quot;;
+}
+//析构函数写法类似构造函数，但没有输入值，也没有返回值
+
+student a;//这种定义方法，不能用delete调用析构函数
+student *p=new student(1,&quot;zs&quot;);
+delete p;//自动调用析构函数
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/codeforces-round-903-div-3/">
+              <h3 class="post-title">
+                Codeforces Round 903 (Div. 3)
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

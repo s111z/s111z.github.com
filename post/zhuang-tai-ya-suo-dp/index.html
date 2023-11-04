@@ -1,0 +1,219 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>状态压缩dp | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              状态压缩dp
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>这类问题一般定义两维，其中一位用二进制数来表示选法或是说方案（当然如果输出当然还是十进制数，我们将之视为二进制数来处理），这类问题需要大量用到位运算。</p>
+<p><a href="https://www.acwing.com/problem/content/293/">蒙得里安的梦想</a></p>
+<p>给定一个n * m的矩形，将1 * 2的小长方形放入，问有多少种放法。</p>
+<p>思路：我们可以发现，如果先放所有可以横着放的小矩形，那么竖着放的小矩形只有唯一一种放法。所以我们就只讨论可以横着放的矩形。</p>
+<p>状态表示：定义一个二维数组f[i][j],i用来表示列数，j用来表示第j行是否有从i-1列伸出来的小矩形。</p>
+<p>状态计算：我们还是看倒数第二步，也就是从i-2伸到i-1列的矩形数量，对于第i列的每种情况，就是将与之匹配合法的所有i-1列的情况加起来即可。因为每一种情况可视为一种分类，这种分类内部的不同类加起来即可。</p>
+<p>判断合法：这里判断合法要考虑的条件一个就是如果某一行已经从i-2列伸到i-1列，那么就不能再从i-1列伸到i列，另一个则是每列空出来的连续部分不能是奇数，因为竖着放需要占两个格子。因为我们是用二进制数来表示每一位是否有伸出，所以我们可以对所有可能出现的二进制数进行统计，判断是否有连续偶数个0。至于第一个条件的判断就两个数取与（&amp;），只有同时都有的情况下才是非0的，同时都有也就不符合要求了。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=12;
+long long f[12][5000];//方案数可能会很多
+bool st[5000];
+int main()
+{
+    int n,m;
+    while(scanf(&quot;%d%d&quot;,&amp;n,&amp;m))
+    {
+        if(!n&amp;&amp;!m) break;
+        
+        memset(f,0,sizeof f);
+        
+        for(int i=0;i&lt;1&lt;&lt;n;i++)
+        {
+            int c=0;
+            st[i]=true;
+            for(int j=0;j&lt;n;j++)
+            {
+                if(i&gt;&gt;j &amp; 1)
+                {
+                    if(c &amp; 1) st[i]=false;
+                    c=0;
+                }
+                else c++;
+            }
+            if(c&amp;1) st[i]=false;
+        }
+        f[0][0]=1;//第0列的一个都没有的方案为1
+        for(int i=1;i&lt;=m;i++)//列的范围是[0,m-1],因为我们要考虑后一列情况，所以从1开始
+        {
+            for(int j=0;j&lt;1&lt;&lt;n;j++)
+            {
+                for(int k=0;k&lt;1&lt;&lt;n;k++)
+                {
+                    if((j&amp;k) == 0)//位运算的优先级小于逻辑运算
+                    {
+                        if(st[j|k])
+                        {
+                            f[i][j] += f[i-1][k];
+                        }
+                    }
+                }
+            }
+        }
+        printf(&quot;%lld\n&quot;,f[m][0]);//第m-1列没有伸出去的就是最终方案，因为是累加得到的
+    }
+        
+}
+</code></pre>
+<p><a href="https://www.acwing.com/problem/content/93/">最短Hamilton路径</a></p>
+<p>思路：</p>
+<p>状态表示：定义一个数组f[i][j],用i作为一个二进制数来表示已经走过了哪些点，j表示走到j点时。</p>
+<p>状态计算：划分时按照，从哪个点走到j来划分，f[i][j]=f[{i}-j][k]+a[k][j];</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[30][30],f[1&lt;&lt;20][30];
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=0;i&lt;n;i++)
+    {
+        for(int j=0;j&lt;n;j++)
+        {
+            scanf(&quot;%d&quot;,&amp;a[i][j]);
+        }
+    }
+    memset(f,0x3f,sizeof f);
+    f[1][0]=0;//
+    for(int i=1;i&lt;1&lt;&lt;n;i++)
+    {
+        for(int j=0;j&lt;n;j++)
+        {
+            if((i&gt;&gt;j) &amp; 1)//i表示的走法经过j
+            {
+                for(int k=0;k&lt;n;k++)
+                {
+                    if( (i-(1&lt;&lt;j))&gt;&gt;k &amp; 1 )//刨去j点后的路径经过k
+                    f[i][j]=min(f[i][j],f[i-(1&lt;&lt;j)][k]+a[k][j]);//算术运算符的优先级高于位运算符
+                }
+            }
+        }
+    }
+    cout&lt;&lt;f[(1&lt;&lt;n)-1][n-1];
+}
+</code></pre>
+<p>ps:1&lt;&lt;n,表示1从第1位左移n位，即移到n+1位</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/gao-jing-du-ya-wei/">
+              <h3 class="post-title">
+                高精度压位
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

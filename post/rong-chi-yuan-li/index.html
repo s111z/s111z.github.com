@@ -1,0 +1,163 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>容斥原理 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              容斥原理
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>容斥原理的思想可由韦恩图得来。</p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.luogu.com.cn/upload/image_hosting/pz15fh6c.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="" loading="lazy"></figure>
+<p>这里的s不知可以表示面积，还可以表示包含的元素等。</p>
+<p><a href="https://www.acwing.com/problem/content/892/">能被整除的数</a></p>
+<p>比如这个题，问1-n中可以被给定的m个质数整除的数有多少个。</p>
+<p>我们可以将每个给定的质数的倍数视为一个集合，那就转化为求所有集合元素的并集。可以通过容斥原理来算。</p>
+<p>用一个二进制数来表示，当前考虑那些质数的倍数。我们只用求个数，就可以用n/p，就可以得到,n中有多少个数是p的倍数。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int p[20];
+int main()
+{
+    int n,m;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=0;i&lt;m;i++) scanf(&quot;%d&quot;,&amp;p[i]);
+    int res=0;
+    for(int i=1;i&lt;1&lt;&lt;m;i++)//i==0那么就是一个都不选，没有讨论的意义
+    {
+        int t=1,c=0;
+        for(int j=0;j&lt;m;j++)
+        {
+            if(i&gt;&gt;j&amp;1)//判断当前位选不选
+            {
+                if((long long)t*p[j]&gt;n)//如果大于n了也没有讨论的意义了
+                {
+                    t=-1;
+                    break;
+                }
+                t *= p[j];
+                c++;
+            }
+        }
+        if(t!=-1)
+        {
+            if(c%2) res += n/t;
+            else res -= n/t;
+        }
+    }
+    cout&lt;&lt;res;
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/jian-dan-bo-yi-lun/">
+              <h3 class="post-title">
+                简单博弈论
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

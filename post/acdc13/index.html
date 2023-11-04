@@ -1,0 +1,600 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ACDC13 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              ACDC13
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-26 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/43/problem/C">Lucky Tickets</a><br>
+题目大意：a收集了一些序号可以整除3的门票，b将它们都撕成两半了，并且还丢掉一些，a打算把剩下的票两两粘起来，但粘起来的条件是粘好后序号可以整除3.，问最后最多可以得到多少张票。</p>
+<p>思路：我们知道能整除3的数的特征就是每一位数的和是3的倍数，我们将所有的票上的数字的数位和都算出来，得到的这些数可以分为3类（按照模3的余数来分）。<br>
+由于 a%n+b%n=(a+b)%n<br>
+所以我们将余数为1和2的配对，余数为3的自己配对即可。<br>
+进一步只用统计3类数的数量即可。<br>
+代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	int x1=0,x2=0,x3=0;
+	for(int i=0;i&lt;n;i++)
+	{
+		string s;
+		cin&gt;&gt;s;
+		int ans=0;
+		for(int j=0;j&lt;s.size();j++)
+		{
+			ans += s[j]-'0';
+			ans %= 3;
+		}
+		if(ans%3==1) x1++;
+		else if(ans%3==2) x2++;
+		else x3++;
+	}
+	int res = min(x1,x2)+x3/2;
+	cout&lt;&lt;res;
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/598/problem/B">Queries on a String</a><br>
+题目大意：给定一个字符串，同时给出m个询问，对于每个询问，我们给出l,r,k三个数，需要在[l,r]的区间内，将每个字符后移k位，最后移出区间后从前面再放入即可。问经过m的询问后，我们最终的字符串是多少。</p>
+<p>思路：很明显这是个模拟题，但是直接写模拟会超时，那么我们就要进行优化：<br>
+优化一：当k==len(区间长度)时，相当于没有进行移动，所以我们可以对移动次数进行等效缩小。<br>
+优化2：将写循环一个一个移动优化成整块整块移动（对比初末位置可发现，实际上是两整块之间进行移动）<br>
+两块分别是[l,l+k-1] [l+k,r]</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+char s[10010];
+char t[10010];
+int main()
+{
+	scanf(&quot;%s&quot;,s+1);
+	int m;
+	scanf(&quot;%d&quot;,&amp;m);
+	while(m--)
+	{
+		int l,r,k;
+		scanf(&quot;%d%d%d&quot;,&amp;l,&amp;r,&amp;k);
+		int len=r-l+1;
+		k %= len;//优化移动次数
+		for(int i=l+k,j=l;i&lt;=r;j++,i++) t[i]=s[j];//将前一块移到后面
+		for(int i=l,j=r-k+1;j&lt;=r;i++,j++) t[i]=s[j];//将后一块移到前面
+		for(int i=l;i&lt;=r;i++) s[i]=t[i];//将移动好的赋值给原字符串
+	}
+	printf(&quot;%s&quot;,s+1);
+	return 0;
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/653/problem/B">Bear and Compressing</a><br>
+题目大意：北极熊有一个长度为q的字符串s，想要压缩这个字符串，我们给定一些规则，每条规则包括两部分a,b,a包含两个字符，b包含一个字符，我们规定当s的前两个字符与任意一条规则中的a相同时，可以将前两个字符压缩为b，否则不可以进行压缩。最后得到字符'a',问s有多少种可能情况。另外由于北极熊比较小，只认识a-f这6个字母，所以s中不会出现这六个字母以外的字母，同时，字符串长度在2-6之间。</p>
+<p>思路：这个题最开始我想的是一层层拆分，但很明显情况越讨论越复杂，但我突然注意到，这道题的数据范围很小，6^6=46,656,即字符串最多只有这么多种，那么我们可以直接表示出所有长度为q的字符串，然后判断能不能压缩成a即可。对于压缩规则，我们可以用map&lt;string,string&gt;来存。而讨论所有情况时就类似于数字的排列，dfs即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,q;
+string s;
+map&lt;string,string&gt;mp;
+int ans;
+void dfs(int k)
+{
+	if(k==n)
+	{
+		string s1;
+		s1+=s[0];
+		s1+=s[1];
+		int i=2;
+		while(mp.count(s1)&amp;&amp;i&lt;n)
+		{
+			s1=mp[s1];
+			s1 += s[i];
+			i++;
+		}
+		if(mp.count(s1)) s1 = mp[s1];
+		if(s1==&quot;a&quot;) ans++;
+		return;
+	}
+	for(char i='a';i&lt;='f';i++)
+	{
+		s += i;
+		dfs(k+1);
+		s.pop_back();
+	}
+}
+int main()
+{
+	cin&gt;&gt;n&gt;&gt;q;
+	while(q--)
+	{
+		string a,b;
+		cin&gt;&gt;a&gt;&gt;b;
+		mp[a]=b;
+	}
+	dfs(0);
+	cout&lt;&lt;ans;
+}
+</code></pre>
+<p>ps:string后接字符串可以直接s+=ch，但是去掉末尾字符串不能直接s-=ch,可以用s.pop_back();<br>
+判断map的键值中是否存在a，可以用map.count(a)来判断，返回1表示有，返回0表示没有<br>
+直接给string赋值，可以覆盖掉原来的字符串</p>
+<p><a href="https://codeforces.com/contest/288/problem/A">Polo the Penguin and Strings</a><br>
+题目大意：题目给定两个数n,k，问有多少个字符串满足条件：<br>
+长度为n<br>
+有k个字符不同<br>
+相邻两个字符不能相同<br>
+如果不存在符合条件的字符那么就输出-1<br>
+如果存在输出字典序最小的字符串</p>
+<p>思路：首先考虑字典序最小，同时要有k个字符不同，那么我们用且仅用k个字符，那么如果n小于k，一定没有合法的字符串；n==k时，就从a开始按顺序输出字母即可；n&gt;k时，我就在前面用a,b进行交替，最后加上剩下的字符即可。这里特别要注意，k可以取到1，k取到1的时候，意思是有1个字符不同，实际上就是只能有一个字符，有两个字符的时候就不符合有1个字符不同的条件。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int n,k;
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+	if(n&lt;k) printf(&quot;-1&quot;);
+	else
+	{
+		if(k==1) 
+		{
+			if(n!=1)printf(&quot;-1&quot;);
+			else printf(&quot;a&quot;);
+		}
+		else
+		{
+			if(n==k)
+			{
+				for(int i=0;i&lt;n;i++) printf(&quot;%c&quot;,'a'+i);
+			}
+			else
+			{
+				int d=n-k+2;
+				for(int i=0;i&lt;d;i++)
+				{
+					if(i%2==0) printf(&quot;a&quot;);
+					else printf(&quot;b&quot;);
+				}
+				for(int i=d,j=2;i&lt;n;i++,j++)
+				{
+					printf(&quot;%c&quot;,'a'+j);
+				}
+			}
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1694/problem/B">Paranoid String</a><br>
+题目大意：给定一个二进制序列，有一下两个合并条件:<br>
+01-&gt;1<br>
+10-&gt;0<br>
+要求我们给出[l,r]，使可以根据规则将[l,r]段合并成1个字符，问我们有多少个满足条件的区间。</p>
+<p>思路：<br>
+当只有1个字符的时，是一定符合要求的<br>
+当有两个字符的时候，有两种情况（也可以细分成4种），即两个相同，两个相异，两相同肯定不行，两相异一定可以<br>
+当有3个字符的时候：<br>
+后两个相异: 101,001,010,110<br>
+101-&gt;01-&gt;1<br>
+001-&gt;01-&gt;1<br>
+010-&gt;10-&gt;0<br>
+110-&gt;10-&gt;0<br>
+故后两个相异时，倒数第三个是什么都无所谓<br>
+后两个相同：100，000，111，011<br>
+100-&gt;00<br>
+000<br>
+111<br>
+011-&gt;11<br>
+后两个相同无论倒数第三个是什么都不能合并<br>
+后两个相异，那么一定可以将3个合并成两个相异的，倒数第四个是什么也就无所谓了<br>
+所以我们首先ans=n(每个字符单独一个是可以的)，然后循环，每访问到一个字符，如果与前面相同时，（当前长度-1）就是可以产生的合法区间。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+long long ans;
+char s[200010];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		scanf(&quot;%s&quot;,s);
+		ans=n;
+		for(int i=1;i&lt;n;i++)
+		{
+			if(s[i]!=s[i-1]) ans += i;
+		}
+		printf(&quot;%lld\n&quot;,ans);
+	}
+	return 0;
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1311/problem/B">WeirdSort</a><br>
+题目大意：给定数组a[]和数组p[],我们只能将a中下标为p[i]和p[i]+1的进行交换，我们可以进行无限次交换，问最终能否使a[]成为非降序排列的数组。</p>
+<p>思路1：写一个死循环，每次都遍历判断可以进行交换的是否需要进行交换。最后没有交换时退出，遍历数组a，判断是非为非降序排列。这就有两种实现方式：<br>
+实现1(遍历数组p):</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int p[200],a[200];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,m;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		memset(p,0,sizeof p);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+		for(int i=0;i&lt;m;i++) 
+		{
+			int x;
+			scanf(&quot;%d&quot;,&amp;x);
+			p[x]=1;
+		}
+		while(1)
+		{
+			int flag=0;
+			for(int i=1;i&lt;n;i++)
+			{
+				if(a[i]&gt;a[i+1]&amp;&amp;p[i]) 
+				{
+					swap(a[i],a[i+1]);
+					flag=1;
+				}
+			}
+			if(!flag) break;
+		}
+		int flag=0;
+		for(int i=1;i&lt;n;i++)
+		{
+			if(a[i]&gt;a[i+1])
+			{
+				flag=1;
+				break;
+			}
+		}
+		if(flag) printf(&quot;NO\n&quot;);
+		else printf(&quot;YES\n&quot;);
+	}
+}
+</code></pre>
+<p>实现2(遍历数组a):</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int p[200],a[200];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,m;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		memset(p,0,sizeof p);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+		for(int i=0;i&lt;m;i++) 
+		{
+			int x;
+			scanf(&quot;%d&quot;,&amp;x);
+			p[i]=x;
+		}
+		while(1)
+		{
+			int flag=0;
+			for(int i=0;i&lt;m;i++)
+			{
+				if(a[p[i]]&gt;a[p[i]+1]) 
+				{
+					swap(a[p[i]],a[p[i]+1]);
+					flag=1;
+				}
+			}
+			if(!flag) break;
+		}
+		int flag=0;
+		for(int i=1;i&lt;n;i++)
+		{
+			if(a[i]&gt;a[i+1])
+			{
+				flag=1;
+				break;
+			}
+		}
+		if(flag) printf(&quot;NO\n&quot;);
+		else printf(&quot;YES\n&quot;);
+	}
+}
+</code></pre>
+<p>思路2：我们可以发现可以交换的部分实际上是一段一段的，我们只要找出每一段，因为可以进行无限次排序，那么就可以将这一段排成非降序，最后遍历a，判断是否为非降序即可。特别地，要注意给的p[]未必是按顺序排的，所以我们要对p排一次序。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[200],p[200];
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n,m;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		for(int i=0;i&lt;n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+		for(int i=0;i&lt;m;i++)
+		{
+			int x;
+			cin&gt;&gt;x;
+			p[i]=x-1;
+		}
+		sort(p,p+m);
+		int l=p[0],r=p[0]+1;
+		for(int i=1;i&lt;m;i++)
+		{
+			if(r!=p[i])
+			{
+				sort(a+l,a+r+1);
+				l=p[i],r=p[i]+1;
+			}
+			else
+			{
+				r=p[i]+1;
+				
+			}
+		}
+		sort(a+l,a+r+1);
+			int c=a[0],flag=1;
+		for(int i=1;i&lt;n;i++)
+		{
+			if(c&gt;a[i])
+			{
+				printf(&quot;NO\n&quot;);
+				flag=0;
+				break;
+			}
+			c=a[i];
+		}
+		if(flag) printf(&quot;YES\n&quot;);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/303/problem/A">Lucky Permutation Triple</a><br>
+题目大意：定义了排序的概念，长度为n的排列中只能出现0~n-1的元素，同时每个元素只能出现一次。现给定一个n，要求我们给出三个长为n的排列a,b,c,要求满足：<br>
+a%n+b%n=c%n<br>
+如果不存在输出-1。<br>
+思路：我们分析可得，可以进行错位来得到排列，例如:n=5:<br>
+a:0 1 2 3 4<br>
+b:4 0 1 2 3<br>
+c:4 1 3 0 2<br>
+但是要注意到，n为偶数时是不成立的，证明如下：<br>
+每个排列的和：suma=sumb=sumc=s=(0+n-1)  *   n/2=(n-1)  * n/2;<br>
+因为每一项都满足a%n+b%n=c%n，(a+b)%n=a%n+b%n，所以suma+sumb=sumc (mod n)<br>
+2s=s (mod n)<br>
+s=0 (mod n)<br>
+如果s与0同余，那么(n-1)/2一定要是整数，只有n为奇数时满足，故得证。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	if(n%2==0) printf(&quot;-1&quot;);
+	else
+	{
+	for(int i=0;i&lt;n;i++) printf(&quot;%d &quot;,i);
+	printf(&quot;\n%d &quot;,n-1);
+	for(int i=0;i&lt;n-1;i++) printf(&quot;%d &quot;,i);
+	printf(&quot;\n%d &quot;,n-1);
+	for(int i=0;i&lt;n-1;i++) 
+	{
+		int x=i+(i+1);
+		x %= n;
+		printf(&quot;%d &quot;,x);
+	}
+}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/913/problem/B">Christmas Spruce </a><br>
+题目大意：给定一棵树，我们将只有父节点没有子节点的点定义为叶子，我们需要判断给出的树每一个非叶子节点是否有三个及以上的叶子节点。<br>
+思路：我们开一个vector(可改用set)来记录所有的父节点，同时将父节点的每个子节点记录一下(用set)，最后遍历父节点数组，判断其中的每个元素对应数组的元素是否大于等于3，对了，还需要注意，一个点有子节点时，需要找到它的父节点，并将其从它的父节点对应的数组中弹出。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+
+int main()
+{map&lt;int,int&gt;mp;//键值为子，v为父
+vector&lt;int&gt;a;//可改用set
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	set&lt;int&gt;s[1010];
+	mp[1]=0;
+	for(int i=2;i&lt;=n;i++)
+	{
+		int x;
+		cin&gt;&gt;x;
+		a.push_back(x);
+		s[x].insert(i);
+		mp[i]=x;//将i的父节点标记为x
+		if(s[mp[x]].size()) s[mp[x]].erase(x);//找x的父节点，将x弹出
+	}
+	for(auto t:a)
+	{
+		if(s[t].size()&gt;=3 ) continue;
+		else
+		{
+			printf(&quot;No&quot;);
+			return 0;
+		}
+	}
+	printf(&quot;Yes&quot;);
+	return 0;
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/216/problem/A">Tiling with Hexagons</a><br>
+题目大意：<img src="https://s111z.github.io/post-images/1695787522251.png" alt="" loading="lazy"><br>
+如图，我们给定a,b,c，要求六边形个数。<br>
+思路：实际上就是找规律，我们竖着看可发现左右个数是对称的，进而找到规律</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int main()
+{
+	int a,b,c;
+	scanf(&quot;%lld%lld%lld&quot;,&amp;a,&amp;b,&amp;c);
+	int cnt=a;
+	int res=0;
+	for(int i=1;i&lt;=b-1;i++)
+	{
+		res += cnt;
+		cnt++;
+	}
+	res *= 2;
+	c -= (b-1);
+	res += c*cnt;
+	printf(&quot;%lld&quot;,res);
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/38/problem/B">Chess</a><br>
+题目大意：棋盘中，已经有一个车和一个马，两者互不干扰，要求再放一个马，三者互不干扰，问这个马有多少种放法。<br>
+思路：我们就从三个角度考虑：首先是，原来车和马的位置一定不可放入，其次新放入的马不能消灭原来的两个棋子，由于马的行走路线是固定的，我们只用根据已知的两个位置判断哪些位置不可以放即可，然后再考虑，原来的棋子不能消灭新放入的马，对于原来的马来说无所谓，新马到它和它到新马是互逆的，考虑一个即可，对于车，只用考虑它的同行列即可。那么我们就可以定义一个set&lt;pair&lt;int,int&gt;&gt;s来装哪些位置不可放入即可，最后用64-s.size()即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int rx[]={-2,-2,2,2,1,1,-1,-1};
+int ry[]={1,-1,1,-1,2,-2,2,-2};
+int main()
+{
+	char s1[3],s2[3];
+	scanf(&quot;%s%s&quot;,s1,s2);
+	pair&lt;int,int&gt;a,b;
+	a={s1[0]-'a'+1,s1[1]-'0'};
+	b={s2[0]-'a'+1,s2[1]-'0'};
+	set&lt;pair&lt;int,int&gt;&gt;s;
+	s.insert(a);
+	s.insert(b);
+	for(int i=0;i&lt;8;i++)
+	{
+		int x1,y1,x2,y2;
+		x1=a.first+rx[i];
+		y1=a.second+ry[i];
+		x2=b.first+rx[i];
+		y2=b.second+ry[i];
+		if(1&lt;=x1&amp;&amp;x1&lt;=8&amp;&amp;1&lt;=y1&amp;&amp;y1&lt;=8) s.insert({x1,y1});
+		if(1&lt;=x2&amp;&amp;x2&lt;=8&amp;&amp;1&lt;=y2&amp;&amp;y2&lt;=8) s.insert({x2,y2});
+	}
+	for(int i=1;i&lt;=8;i++)
+	{
+		s.insert({a.first,i});
+		s.insert({i,a.second});
+	}
+	cout&lt;&lt;64-s.size();
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/acdc12/">
+              <h3 class="post-title">
+                ACDC12
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

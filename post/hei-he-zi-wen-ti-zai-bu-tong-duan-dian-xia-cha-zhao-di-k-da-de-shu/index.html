@@ -1,0 +1,229 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>黑盒子问题——在不同断点下查找第k大的数 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              黑盒子问题——在不同断点下查找第k大的数
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-09 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://www.luogu.com.cn/problem/P1801">黑盒子</a><br>
+此类问题是输入一个无序数组，在第i个数被输入后，输出第k大的数。<br>
+这种问题就是要得到合适的有序排列，每次都排序会超时，就要用别的方法来解决，此文提供三种方法：<br>
+1.pbds（平衡树）</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+#include&lt;bits/extc++.h&gt;
+using namespace __gnu_pbds;
+using namespace std;
+#define pii pair&lt;int,int&gt;
+//要注意pbds不支持录入重复元素，我们可以用pair&lt;int,int&gt;来实现
+tree&lt;pii,null_type,less&lt;pii&gt;,rb_tree_tag,tree_order_statistics_node_update&gt;s;
+int a[200010],b[200010];
+void get(int k)
+{
+    cout&lt;&lt;(s.find_by_order(k-1))-&gt;first&lt;&lt;endl;//序号从0开始
+}
+int main()
+{
+    int n,m;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+    for(int i=1;i&lt;=m;i++) scanf(&quot;%d&quot;,&amp;b[i]);
+    int j=1,cnt=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        s.insert({a[i],i});
+        while(b[j]==i)//b[j]的值可能重复
+        {
+            cnt++;
+            get(cnt);
+            j++;
+        }
+    }
+}
+</code></pre>
+<p>2.multiset<br>
+同样可以用multiset来实现，我们定义两个multiset<int>s1,s2;保证如果x1属于s1,x2属于s2,一定有x1&lt; x2,然后在查找第k大的数的时候，只要调整两个集合，保证s1.size()==k即可实现第k大的数为*s1.rbegin()</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[200010],b[200010];
+int main()
+{
+    int n,m;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+    for(int i=1;i&lt;=m;i++) scanf(&quot;%d&quot;,&amp;b[i]);
+    multiset&lt;int&gt;s1,s2;
+    int j=1,cnt=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(s1.size()==0||*s1.rbegin()&gt;=a[i]) s1.insert(a[i]);
+        else s2.insert(a[i]);
+        while(b[j]==i)
+        {
+                cnt++;
+                while(s1.size()&lt;cnt)
+                {
+                    s1.insert(*s2.begin());
+                    s2.erase(s2.begin());
+                }
+                while(s1.size()&gt;cnt)
+                {
+                    s2.insert(*s1.rbegin());
+                    s1.erase(--s1.end());//要注意，erase()中的参数是迭代器，但是s.rbegin()不能被直接拿来使用，所以我们用--end()；
+                }
+                cout&lt;&lt;*s1.rbegin()&lt;&lt;endl;
+                j++;
+        }
+    }
+}
+</code></pre>
+<p>3.priority&lt;int,vector<int>,greater<int>&gt; 优先队列<br>
+其实和multiset差不多，但是有一点要注意，优先队列O(1)复杂度只能访问到堆顶元素，所以我们要建一个大根堆和一个小根堆，相当于把multiset中的s1倒序排列</p>
+<pre><code class="language-cpp">#inlcude&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[200010],b[200010];
+int main()
+{
+    int n,m;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+    for(int i=1;i&lt;=m;i++) scanf(&quot;%d&quot;,&amp;b[i]);
+    priority_queue&lt;int&gt;big;//大根堆，相当于s1
+    priority_queue&lt;int,vector&lt;int&gt;,greater&lt;int&gt;&gt;small;//小根堆，相当于s2
+    int cnt=0,j=1;
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(big.size()==0||big.top()&gt;=a[i]) big.push(a[i]);
+        else small.push(a[i]);
+        while(b[j]==i)
+        {
+            cnt++;
+            while(s1.size()&lt;cnt)
+            {
+                s1.push(s2.top());
+                s2.pop();
+            }
+            while(s1.size()&gt;cnt)
+            {
+                s2.push(s1.top());
+                s1.pop();
+            }
+            cout&lt;&lt;s1.top()&lt;&lt;endl;
+            j++;
+        }
+    }
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/wu-xu-shu-zu-qiu-zhong-wei-shu-o1/">
+              <h3 class="post-title">
+                无序数组求中位数（O(1)）
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

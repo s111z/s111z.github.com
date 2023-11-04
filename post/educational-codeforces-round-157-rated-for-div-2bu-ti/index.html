@@ -1,0 +1,243 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Educational Codeforces Round 157 (Rated for Div. 2)补题 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Educational Codeforces Round 157 (Rated for Div. 2)补题
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-11-04 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/1895/problem/A">Treasure Chest</a><br>
+题目大意：玩家初始在位置0，箱子在位置x，钥匙在位置y，玩家向左（右）移动一格花费1s，其他操作不花费时间，同时玩家只能抱着箱子行走t秒，当玩家、箱子、钥匙在同一点时，解锁成功，要求玩家最少需要多少秒。<br>
+思路：这里只用考虑箱子和钥匙的相对位置即可。<br>
+如果钥匙离玩家更近，那么直接走到箱子所花费的时间就是要求的时间；<br>
+如果箱子离玩家近，那么说明拿完钥匙要折返，于是抱着箱子往前走一点，就可以使折返时间更小。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		if(a&gt;=b) printf(&quot;%d\n&quot;,a);
+		else//box近
+		{
+			int ti=b+max(b-a-c,0);
+			printf(&quot;%d\n&quot;,ti);
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1895/problem/B">Points and Minimum Distance</a><br>
+题目大意：给一个有2*n个元素的数组，我们要将这些数凑成n对，每一对数表示一个坐标，我们要找一条路径保证每个点至少经过一次，两点之间的距离为曼哈顿距离，问这条路径长度的最小值是多少。<br>
+思路：相当于就将差值小的放一块儿减，那么就将数组排序，然后前一半全部用来作为横坐标，后一半用来做为纵坐标。横坐标内部相减累计，纵坐标同理。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int a[200];
+signed main()
+{
+	int t;
+	scanf(&quot;%lld&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%lld&quot;,&amp;n);
+		int len=2*n;
+		for(int i=1;i&lt;=len;i++) scanf(&quot;%lld&quot;,&amp;a[i]);
+		sort(a+1,a+len+1);
+		int sum=0;
+		for(int i=1;i&lt;n;i++) sum += a[i+1]-a[i];
+		for(int i=n+1;i&lt;len;i++) sum += a[i+1]-a[i];
+		printf(&quot;%lld\n&quot;,sum);
+		for(int i=1;i&lt;=n;i++)
+		{
+			printf(&quot;%d %d\n&quot;,a[i],a[i+n]);
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1895/problem/C">Torn Lucky Ticket</a><br>
+题目大意：给n个字串，每个字串的每一位都是1-9的某个数字，我们要将任意两串拼接起来，如果拼接后的字串满足，长度为偶数，同时前半段的数位和等于后半段的数位和，那么这就是个合法的拼接。问有多少个合法拼接。（注意si+sj != sj+si,同时i==j是合法的）<br>
+思路：这道题的实现思路很巧妙，我们首先分析题目，可以发现拼接后，从中间切并不一定保证前半段或者后半段一定是原来的字串。所以对每个字串可能将被从任意地方切开，那么我们就循环这个字串，记录从它每个位置切需要补一个什么样的字串上去。这里我们通过数位和与长度这两个属性来确定字串。记录结束之后，我们遍历原字串数组，累计这个字串的属性被标记了几次，那么就相当于它可以补给几个其他字串，累计一下就好 ，由于si+sj != sj+si，所以不用考虑会重复记录。另外还有一点要考虑，这个字串可以补在后面，也可以补在前面，当这字串补在后面的时候，属性是正值，但当它补在前面的时候，实际上记录它的那个mp中记录的属性应该是负数。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int sum[200010];
+char s[200010][10];
+
+signed main()
+{
+	map&lt;pair&lt;int,int&gt;,int&gt;mp;
+	int n;
+	scanf(&quot;%lld&quot;,&amp;n);
+	for(int i=1;i&lt;=n;i++)
+	{
+		scanf(&quot;%s&quot;,s[i]);
+		int l=strlen(s[i]);
+		int ssum=0;
+		for(int j=0;j&lt;l;j++) ssum += s[i][j]-'0';
+		for(int j=0;j&lt;l;j++)
+		{
+			sum[i] += s[i][j]-'0';
+			mp[{2*sum[i]-ssum,2*(j+1)-l}]++;
+		} 
+	}
+	int ans=0;
+	for(int i=1;i&lt;=n;i++)
+	{
+		int l=strlen(s[i]);
+		ans += mp[{sum[i],l}]+mp[{-sum[i],-l}];
+		//我们计算答案时就是要去找每个字串可以跟哪些字串匹配，那我们不如预处理每个字串从不同位置划分需要补的部分，那么这样的话每个字串的性质如果符合另一个字串某一划分的补就可将两者拼接
+	}
+	printf(&quot;%lld&quot;,ans);
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1895/problem/D">XOR Construction</a><br>
+题目大意：给定一个a[]={a1,a2,...,a(n-1)},a[1]=b[1]^b[2],a[2]= b[2]^b[3],...<br>
+b[]中的数在0~n-1，同时每个数都只出现一次，<br>
+求b[]<br>
+思路:a[1]=b[1]<sup>b[2]=&gt;b[2]=a[1]</sup>b[1],相当于，我们只要确定一个数就能将整个b[]都推出来（先不考虑是否合法），那么我们就将0放在第一位，推出整个b[],这时候有个新的问题，b[]是有范围的，它要在0~n-1之间，我们就需要对已经得到的数组进行处理，这里的处理方法很妙，我们推导可发现，对于0-x，二进制的每一位上，对于整个范围来说，都是0的个数&gt;=1的个数，那么我们只要在1的个数大于0的个数的时候将每个数的这一位都异或上1就可以实现0的个数&gt;=1的个数。详见<a href=""></a> 。</p>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+int a[200005],n;
+int main() 
+{
+	scanf(&quot;%d&quot;,&amp;n);
+	for(int i=1;i&lt;n;i++)
+	{
+        scanf(&quot;%d&quot;,&amp;a[i]);
+        a[i]^=a[i-1];
+    }//这里相当于将b第一个值定为0，然后求b[]
+
+	//将b控制在0~n-1
+	for(int j=0;1&lt;&lt;j &lt; n;j++)
+	{
+		int d=0;
+		for(int i=0;i&lt;n;i++)//访问每一个数的第j位
+			d+=(a[i]&amp;1&lt;&lt;j)==0? 1:-1;//如果a[i]的第j位是0就加1，否则减1，
+			//先算1&lt;&lt;j，那就是取a[i]的第j位
+		if(d&lt;0)//如果1比0多，这里就是要保证所有相同位中，总的1要比0少
+			for(int i=0;i&lt;n;i++)
+				a[i] ^= 1&lt;&lt;j;//每个a[i]的第j位都异或上1
+		//相邻两个数的相对01都不变，所以异或还是可以得到我们想要的a[],让0比1多就可以限制b的范围？			
+	}
+	for(int i=0;i&lt;n;i++)
+		printf(&quot;%d &quot;,a[i]);
+	return 0;
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/yi-huo-ying-she/">
+              <h3 class="post-title">
+                异或-映射
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

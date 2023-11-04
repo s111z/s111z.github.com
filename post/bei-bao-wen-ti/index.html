@@ -1,0 +1,468 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>背包问题 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              背包问题
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>动态规划问题的关键一个是状态表示（集合的意义，集合中值的意义），一个是状态计算（如何划分进而用更小的集合算出目标集合，进而推出公式）</p>
+<h3 id="101背包问题每件物品只有一个">1.01背包问题（每件物品只有一个）</h3>
+<p>先进行状态表示，用f[i][j]来表示从前i个物品中进行选择同时体积不超过j，然后f[i][j]的值用来表示最大值。状态计算的关键就在于第i个物品选不选，如果不选，那就相当于从前i-1个中选，然后总体积不超过j，即f[i][j]=f[i-1][j]；如果选第i个，那么就f[i][j]=f[i-1][j-v[i]]+w[i],要给第i个物品留出位置。</p>
+<pre><code class="language-cpp">//n是物品个数，m是背包体积，v[]表示每件物品体积，w[]表示每件物品的价值（权重）
+for(int i=1;i&lt;=n;i++)
+{
+   for(int j=0;j&lt;=m;j++)
+	{
+		f[i][j]=f[i-1][j];//f[i-1][j]是一定存在的
+		if(v[i]&lt;=j) f[i][j]=max(f[i][j],f[i-1][j-v[i]]+w[i]);
+      //要保证第i个可以被放入
+	}
+}
+</code></pre>
+<p>优化：由递推式可以发现，第一维都是在i-1的基础上得到的，所以实际上更新时只使用到上一层的数据，那么我们可以将第一维去掉，i从小到大访问，所以对于每个f[j]存的一定是i-1时的值，那么f[i][j]=f[i-1][j]可以直接优化成f[j]=f[j],但是因为j-v[i]&lt;j，所以j如果从小到大访问的话，f[j-v[i]]就是i层的值，而非i-1层的值，故而j从大到小进行访问。这样小于等于j的值一定是i-1层的值。</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+	for(int j=m;j&gt;=v[i];j--)//这里直接把j的范围限制在一定可以放入第i个物品的范围内
+  	{
+  		f[j]=max(f[j],f[j-v[i]]+w[i]);
+  	}
+}
+</code></pre>
+<h3 id="2完全背包问题每件物品有无限多个">2.完全背包问题（每件物品有无限多个）</h3>
+<p>也先找状态表示，f[i][j]表示从前i个物品中选同时体积不超过j，关于状态计算，这类问题的关键在于第i个物品选多少个，从0开始考虑，那么就得到<br>
+f[i][j]=max(f[i-1][j-k * v[i]]+k * w[i])</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+    for(int j=0;j&lt;=m;j++)
+    {
+        f[i][j]=f[i-1][j];//第i个物品一个都不选
+        for(int k=1;k*v[i]&lt;=j;k++)
+        {
+            f[i][j]=max(f[i][j],f[i][j-k*v[i]]+w[i]*k);
+        }
+    }
+}
+</code></pre>
+<p>当然这样很容易超时，那么就要进行优化，</p>
+<pre><code>f[i][j]=max(f[i-1][j],f[i-1][j-v]+w,f[i-1][j-2v]+2w,f[i-1][j-3v]+3w,...)
+
+f[i][j-v]=max(        f[i-1][j-v],  f[i-1][j-2v]+w ,f[i-1][j-3v]+2w,...)
+
+由此，f[i][j]=max(f[i-1][j],f[i][j-v]+w);
+</code></pre>
+<p>所以f[i][j]的状态计算就被成功优化</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+    for(int j=0;j&lt;m;j++)
+    {
+        f[i][j]=f[i-1][j];
+        if(j&gt;=v[i]) f[i][j]=max(f[i][j],f[i][j-v[i]]+w[i]);
+    }
+}
+</code></pre>
+<p>但是可发现这个二维的状态表示可以被优化为一维的状态表示。<br>
+对于f[j],每次更新前存的都是i-1层的值，那么f[i][j]=f[i-1][j]就可以用f[j]=f[j]代替，j-v[i]小于j,所以当访问到j时，已经被更新成第i层的值了,也即f[i][j]=f[i][j-v]+w可以用f[j]=f[j-v]+w来代替。</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+    for(int j=v[i];j&lt;=m;j++)
+    {
+        f[j]=max(f[j],f[j-v[i]]+w[i]);
+    }
+}
+</code></pre>
+<h3 id="3多重背包问题有些类似完全背包问题但是多重背包问题中每件物品的数量是有限制的">3.多重背包问题(有些类似完全背包问题，但是多重背包问题中，每件物品的数量是有限制的。)</h3>
+<p>这类问题也是用f[i][j]来表示从前i个物品中选同时体积不超过j，关于状态计算在于第i个物品选多少个<br>
+朴素版做法</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+    for(int j=0;j&lt;=m;j++)
+    {
+        f[i][j]=f[i-1][j];//一个都不选
+        for(int k=1;k&lt;=s[i]&amp;&amp;k*v[i]&lt;=j;k++)
+        {
+            f[i][j]=max(f[i][j],f[i-1][j-k*v[i]]+k*w[i]);
+        }
+    }
+}
+</code></pre>
+<p>同样数据一大就一定会超时，所以一定要优化，但不能用优化完全背包问题的思路来进行优化</p>
+<pre><code class="language-cpp">f[i][j]=max(f[i-1][j],f[i-1][j-v]+w,f[i-1][j-2v]+2w,...f[i-1][j-sv]+sw);
+f[i][j-v]=max(        f[i-1][j-v]   ,f[i-1][j-2v]+w,...f[i-1][j-sv]+(s-1)w,f[i-1][j-(s+1)v]+sw);
+</code></pre>
+<p>故而不能用优化完全背包问题的方法来进行优化，这里用到一种比较巧的方法来优化，二进制法。</p>
+<p>1，2，4,8,...</p>
+<p>1，2可以拼出1，2，3</p>
+<p>1，2，4可以拼出1，2，3，4，5，6，7</p>
+<p>...<br>
+由此将s进行拆分打包，将每一包视为单独的个体，那就转化为01背包问题，每个个体选与不选，从0-s都可以被凑出来。</p>
+<p>二维写法：</p>
+<pre><code class="language-cpp">int v[],w[],f[]
+int c=0;
+for(int i=1;i&lt;=n;i++)
+{
+    int a,b,s;
+    int k=1;
+    while(k&lt;=s)
+    {
+        c++;
+        v[c]=k*a;
+        w[c]=k*b;
+        s -= k;
+        k *= 2;
+    }
+}
+for(int i=1;i&lt;=c;i++)
+{
+    for(int j=m;j&gt;=v[i];j--)
+    {
+        f[i][j]=f[i-1][j];
+        f[i][j]=max(f[i][j],f[i-1][j-v[i]]+w[i]);        
+    }
+}
+
+</code></pre>
+<p>一维优化：</p>
+<pre><code class="language-cpp">int v[],w[],f[]
+int c=0;
+for(int i=1;i&lt;=n;i++)
+{
+    int a,b,s;
+    int k=1;
+    while(k&lt;=s)
+    {
+        c++;
+        v[c]=k*a;
+        w[c]=k*b;
+        s -= k;
+        k *= 2;
+    }
+}
+for(int i=1;i&lt;=c;i++)
+{
+    for(int j=m;j&gt;=v[i];j--)
+    {
+        f[j]=max(f[j],f[j-v[i]]+w[i]);        
+    }
+}
+
+</code></pre>
+<p>当然数据范围更大后二进制打包也会超时，就又要引入一种新的方法——滑动窗口优化。<br>
+滑动窗口优化的思路在于通过找规律可发现j只会从与j%v余数相同的更新而来，因为每次新增时，会减去j的整数倍来腾空间。而且找规律可发现，每组的更新可以抽象成滑动窗口问题，所以我们可以将j分组(按照余数分组，可证明一定可以将合法的j都讨论到），对于每一组，建一个单调队列来模拟滑动窗口。详细的证明可见：<a href="https://www.acwing.com/solution/content/53507/">多重背包问题单调队列优化的证明</a></p>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+
+using namespace std;
+
+const int N = 1010, M = 20010;
+
+int n, m;
+int v[N], w[N], s[N];
+int f[N][M];
+int q[M];
+
+int main()
+{
+    cin &gt;&gt; n &gt;&gt; m;
+    for (int i = 1; i &lt;= n; ++ i) cin &gt;&gt; v[i] &gt;&gt; w[i] &gt;&gt; s[i];
+    for (int i = 1; i &lt;= n; ++ i)
+    {
+        for (int r = 0; r &lt; v[i]; ++ r)
+        {
+            int hh = 0, tt = -1;//对每一个余数开一个队列，同队列中的可以进行更新
+            for (int j = r; j &lt;= m; j += v[i])
+            {
+                while (hh &lt;= tt &amp;&amp; j - q[hh] &gt; s[i] * v[i]) hh ++ ;//差值大于s[i]*v[i]即表示窗口已满，因为最多加到sw
+                //相当于讨论不同体积下放入物品的情况
+                
+                while (hh &lt;= tt &amp;&amp; f[i - 1][q[tt]] + (j - q[tt]) / v[i] * w[i] &lt;= f[i - 1][j]) -- tt;
+                //弹出后面不会再用到的元素，前面体积更小的如果价值小于当前情况的话，那么后面一定不会用前面价值小的进行更新
+                
+                q[ ++ tt] = j;//将最大的元素放到顶端
+                f[i][j] = f[i - 1][q[hh]] + (j - q[hh]) / v[i] * w[i];
+                //最大的一定在队头位置，如果队头上面有更大的，那个更大的被放入时会将整个队列弹空
+            }
+        }
+    }
+    cout &lt;&lt; f[n][m] &lt;&lt; endl;
+    return 0;
+}
+
+</code></pre>
+<p>当然二维写法可以优化成一维，但要注意基于本题思路，j只能从小到大访问，所以更新后面时用到的可能就是被更新的i层的数据，所以要用一个数组来存i-1层的数据。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int v[1010],w[1010],s[1010],q[20010],f[20010],g[20010];
+int main()
+{
+    int n,m;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++)
+    {
+        scanf(&quot;%d%d%d&quot;,&amp;v[i],&amp;w[i],&amp;s[i]);
+    }
+    for(int i=1;i&lt;=n;i++)
+    {
+        memcpy(g,f,sizeof f);
+        for(int r=0;r&lt;v[i];r++)
+        {
+            int hh=0,tt=-1;
+            for(int j=r;j&lt;=m;j+=v[i])
+            {
+                while(hh&lt;=tt&amp;&amp;j-q[hh]&gt;s[i]*v[i]) hh++;
+                while(hh&lt;=tt&amp;&amp;g[q[tt]]+(j-q[tt])/v[i]*w[i]&lt;g[j]) tt--;
+                q[++tt]=j;
+                f[j]=g[q[hh]]+(j-q[hh])/v[i]*w[i];
+            }
+        }
+    }
+    printf(&quot;%d&quot;,f[m]);
+}
+</code></pre>
+<h3 id="4分组背包问题有i组每组只能选一个">4.分组背包问题（有i组，每组只能选一个）</h3>
+<p>这里用f[i][j]来表示从前i组中选同时体积不能超过j；关于状态计算就是从第i组选0个，或者第1个，第2个，...</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+    for(int j=0;j&lt;=m;j++)
+    {
+        f[i][j]=f[i-1][j];//不从第i组中进行选择
+        for(int k=1;k&lt;=s[i];k++)
+        {
+            if(v[i][k]&lt;=j) f[i][j]=max(f[i][j],f[i-1][j-v[i][k]]+w[i][k]);
+        }
+    }
+}
+</code></pre>
+<p>一维优化</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n;i++)
+{
+    for(int j=m;j&gt;=0;j--)
+    {
+        for(int k=1;k&lt;=s[i];k++)
+        {
+            if(v[i][k]&lt;=j) f[j]=max(f[j],f[j-v[i][k]]+w[i][k]);//要用i-1层的数据
+        }
+    }
+}
+
+</code></pre>
+<h3 id="混合背包问题">混合背包问题</h3>
+<p>有三类物品：第一类物品只能用一次，第二类物品可用无限多次，第三类物品最多只能用si次，然后给定背包容量，问不超过容量的最大价值。</p>
+<p>思路：将第三类物品进行二进制划分得到一堆新的第一类物品，然后，开始遍历所有的物品，对于01背包问题就从大到小遍历体积m，对于完全背包问题就从小到大遍历体积m（理由见前面关于01背包和完全背包的推导）。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">struct th
+{
+    int v,w,kind;
+};
+vector&lt;th&gt;t;
+//s==-1,01背包，s==0完全背包，s&gt;0多重背包
+cin&gt;&gt;n&gt;&gt;m;
+for(int i=1;i&lt;=n;i++)
+{
+    int v,w,s;
+    scanf(&quot;%d%d%d&quot;,&amp;v,&amp;w,&amp;s);
+    if(s&lt;=0) t.push_back({v,w,s});
+    else
+    {
+        for(int k=1;k&lt;=s;k*=2)
+        {
+            s -= k;
+            t.push_back({k*v,k*w,-1});
+        }
+        if(s) t.push_back({s*v,s*w,-1});
+    }
+}
+for(auto it:t)
+{
+    if(it.kind==-1)
+        for(int j=m;j&gt;=it.v;j--) 
+            f[j]=max(f[j],f[j-it.v]+it.w);
+
+    else
+        for(int j=it.v;j&lt;=m;j++) 
+            f[j]=max(f[j],f[j-it.v]+it.w);
+}
+cout&lt;&lt;f[m]&lt;&lt;endl;
+</code></pre>
+<h3 id="二维费用的背包问题">二维费用的背包问题</h3>
+<p>这类问题限定容量和重量（对01背包）</p>
+<p>思路：既然限定有两个，那么就定义二维数组（定义三维数组的话，1e3<em>1e3</em>1e3内存会超，故定义二维数组）f[i][j]表示体积不超过i，重量不超过j时的最大值，写个三重循环，然后更新时同时更新i,j</p>
+<p>代码：</p>
+<pre><code class="language-cpp">  for(int i=1;i&lt;=N;i++)
+    {
+        //01背包问题，所以对两重限制的枚举都是从小到大，这道题朴素写法一定会超时
+        for(int j=V;j&gt;=v[i];j--)
+        {
+            for(int k=M;k&gt;=m[i];k--)
+            {
+                f[j][k]=max(f[j][k],f[j-v[i]][k-m[i]]+w[i]);//在更新状态时，两重限定都要更新
+            }
+        }
+    }
+</code></pre>
+<h3 id="背包问题求方案数">背包问题求方案数</h3>
+<p>这类问题就是求最优解的方案数（对01背包）</p>
+<p>除f[]数组外，再开一个数组记录方案数，对于更新时定义两个变量t,s,t=max(f[j],f[j-v[i]]+w[i]),如果t<mark>f[j]那么 s += g[j],如果t</mark>f[j-v[i]]+w[i],那么s += g[j-v[i]],最后再更新f[j]和g[j]。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">    for(int i=1;i&lt;=n;i++)
+    {
+        for(int j=m;j&gt;=v[i];j--)
+        {
+            int t=max(f[j],f[j-v[i]]+w[i]);
+            int s=0;
+            if(t==f[j]) s += g[j],s%=mod;
+            if(t==f[j-v[i]]+w[i]) s += g[j-v[i]],s %= mod;
+            f[j]=t;
+            g[j]=s;
+        }
+    }
+    int mx=0;
+    for(int i=0;i&lt;=m;i++) mx=max(f[i],mx);
+    int res=0;
+    for(int i=0;i&lt;=m;i++)
+    {
+        if(f[i]==mx)
+        {
+            res += g[i];
+            res %= mod;
+        }
+    }
+</code></pre>
+<h3 id="求背包问题的方案">求背包问题的方案</h3>
+<p>这类题就是求具体某一种最优方案，下面讨论的是求字典序最小的方案</p>
+<p>这类题比较独特的一点是对于i的访问是倒序的，所以最优解是f[1][j],那么我们考虑方案时正序访问i，f[1][j]=max(f[2][j],f[2][j-v[1]]+w[1]),如果f[1][j]==f[2][j]那么证明最优方案中不包含1，如果f[1][j]==f[2][j-v[1]]+w[1],那么1就可以被放入，当两个都可以的时候为了得到最小字典序，1也是可以被放入的。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">for(int i=n;i&gt;=1;i--)
+    {
+        
+        for(int j=0;j&lt;=m;j++)
+        {
+            f[i][j]=f[i+1][j];
+            if(v[i]&lt;=j) f[i][j]=max(f[i][j],f[i+1][j-v[i]]+w[i]);
+        }
+    }
+    int vol=m;
+    for(int i=1;i&lt;=n;i++)
+    {
+        //因为i是倒序遍历的，所以f[1][m]是最优解，那我们正序去看，如果f[1][m]==f[2][vol-v[1]]+w[1]证明1可以被放入，哪怕f[1][m]==f[2][m],也会为了字典序将1放入，以此类推。
+        if(vol&gt;=v[i]&amp;&amp;f[i][vol]==f[i+1][vol-v[i]]+w[i])
+        //这里要判断一下，首先第i个物品要能放进去。因为f[][]已经被从后往前更新过了，如果后一个判断条件成立，就证明i是方案中的
+        {
+            printf(&quot;%d &quot;,i);
+            vol -= v[i];
+        }
+    }
+</code></pre>
+<h3 id="有依赖的背包问题">有依赖的背包问题</h3>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/qi-ta-tan-xin-wen-ti/">
+              <h3 class="post-title">
+                其他贪心问题
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

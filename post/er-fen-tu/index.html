@@ -1,0 +1,279 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>最小生成树和二分图 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              最小生成树和二分图
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h2 id="最小生成树">最小生成树</h2>
+<p>最小生成树是对于一个无向图引出的定义，在一个无向图中有一棵树T，T包含所有的点，同时T中的边也属于该无向图，同时边权和最小。最小生成树没有环<br>
+普利姆算法（Prim）<br>
+朴素版O(n^2) 稠密图<br>
+堆优化O(mlogn) (很少用，效率不如克鲁斯卡尔算法)<br>
+克鲁斯卡尔算法（Kruskal） O(mlogm) 稀疏图</p>
+<h2 id="二分图">二分图</h2>
+<pre><code> 判断是否为二分图  染色法O(n+m)
+ 匈牙利算法 O(mn),一般远小于O(nm)
+</code></pre>
+<p>Prim算法<br>
+这种算法就是从1开始（实际上可以从任一点开始，侧重点是边，而且每个点都要被放入最小生成树，而且是无向图，所以从哪儿开始都可以），更新每个点的距离，然后找最小距离的点，将这个距离加入res中，然后再用这个点更新其他的点，更新时需要注意，我们想要得到的距离是点到集合的距离，所以我们每次找出的点放进集合后，就是判断这个点到其他点的距离，会不会让其他点到集合的距离更短。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=510,inf=0x3f3f3f3f;
+int n,m,res;
+int g[N][N],d[N],st[N];
+int Prim()
+{
+    memset(d,0x3f,sizeof d);
+    //其实定哪个为起点都无所谓，因为最小生成树需要包含所有的点，我们随意定一个点，然后实际用到的是它所有出边里面最短的，每次连一个点，然后下一次循环找目前已经更新过的距离集合最近的点
+    for(int i=0;i&lt;n;i++)
+    {
+        int t=-1;
+        for(int j=1;j&lt;=n;j++)
+        {
+            if(!st[j]&amp;&amp;(t==-1||d[j]&lt;d[t])) t=j;
+        }
+       // cout&lt;&lt;t&lt;&lt;&quot; &quot;&lt;&lt;d[t]&lt;&lt;endl;
+        if(i&amp;&amp;d[t]==inf) return inf;
+        st[t]=1;
+        if(i) res += d[t];
+        for(int j=1;j&lt;=n;j++) d[j]=min(d[j],g[t][j]);
+    }
+}
+int main()
+{
+    memset(g,0x3f,sizeof g);
+    cin&gt;&gt;n&gt;&gt;m;
+    while(m--)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        g[a][b]=g[b][a]=min(g[a][b],c);
+    }
+    int t=Prim();
+    if(t==inf) printf(&quot;impossible&quot;);
+    else printf(&quot;%d&quot;,res);
+}
+</code></pre>
+<p>Kruskal<br>
+这个算法用到了并查集，实现思路是将所有的边按照从小到大的顺序排列，然后访问这些边，用并查集来表示连通块，对于每次访问到的边，判断两个节点是否属于一个并查集，如果不是就将它们连通起来，当然，如果是就意味着它们以更短的边被放进集合中去了，不需要更新。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=100010,M=200010;
+struct edge
+{
+    int a,b,c;
+}e[M];
+int p[N];
+bool cmp(edge a,edge b)
+{
+    return a.c&lt;b.c;
+}
+int find(int a)
+{
+    if(p[a]!=a) p[a]=find(p[a]);
+    return p[a];
+}
+int n,m;
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    for(int i=0;i&lt;m;i++)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        e[i]={a,b,c};
+    }
+    sort(e,e+m,cmp);
+    for(int i=1;i&lt;=n;i++) p[i]=i;
+    int res=0,cnt=0;
+    /*用并查集来表示连通块，按照边权排序后，从小到大访问，访问到a,b时，如果两者不属于同一个连通块，
+    那就将两者连起来，并将当前访问到的边放入最小生成树中*/
+    for(int i=0;i&lt;m;i++)
+    {
+        int a=e[i].a,b=e[i].b,c=e[i].c;
+        a=find(a),b=find(b);
+        if(a!=b) 
+        {
+            p[a]=b;
+            res += c;
+            cnt++;
+        }
+    }
+    if(cnt&lt;n-1) printf(&quot;impossible&quot;);
+    else printf(&quot;%d&quot;,res);
+}
+</code></pre>
+<h2 id="二分图-2">二分图</h2>
+<p>二分图定义：一个图中的所有点可以被分进两个集合中去，同一集合中的点不相连，所有的边都在两个集合之间。<br>
+二分图性质：一个图是二分图，当且仅当图中不含有奇数环（环中边数为奇数被称为奇数环）<br>
+二分图有两个考点：<br>
+判断图是否为二分图<br>
+求二分图的最大匹配</p>
+<p>判断图是否为二分图用的是染色法，原理是对于每个点进行深搜，将每个连通块染色，每个点和与之相连的点染色相反，如果在染色过程中出现矛盾，那么就不是二分图。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m;
+const int N=100010,M=200010;//要注意因为是无向图，所以要建两条边，故而是2倍，如果数组越界，那么什么问题都有可能发生。
+int h[N],e[M],ne[M],idx;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+int c[N];
+int dfs(int v,int color)
+{
+    c[v]=color;
+    for(int i=h[v];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(!c[j])
+        {
+            if(!dfs(j,3-color)) return 0;
+        }
+        if(c[j]==color) return 0;
+    }
+    return 1;
+}
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    memset(h,-1,sizeof h);
+    while(m--)
+    {
+        int a,b;
+        cin&gt;&gt;a&gt;&gt;b;
+        add(a,b),add(b,a);
+    }
+    int flag=1;
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(!c[i])
+        {
+            if(!dfs(i,1))
+            {
+                flag=0;
+                break;
+            }
+        }
+    }
+    if(flag) printf(&quot;Yes&quot;);
+    else printf(&quot;No&quot;);
+}
+</code></pre>
+<p>匈牙利算法<br>
+匈牙利算法是用来求二分图的最大匹配的算法，由于二分图的性质，我们可以抽象成两个集合中的元素两两配对，只能是一对一的关系，问最多能配出多少对。</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/zui-duan-lu/">
+              <h3 class="post-title">
+                最短路
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

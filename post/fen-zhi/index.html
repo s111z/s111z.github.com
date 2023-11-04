@@ -1,0 +1,393 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>分治 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              分治
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-27 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>点分治<br>
+点分树（动态点分治）<br>
+分治FFT<br>
+线段树分治<br>
+“动态DP”&amp;动态树分治<br>
+关于分治，不需要考虑函数的具体细节，我们只要明确函数能实现什么功能，并正确调用即可。所以关键在于，明确在不断分小的过程中，什么操作是相同的，递归函数的意义就是来实现这一相同操作。<br>
+明确两点：如何往小的分（或是说一遍操作后，下一遍进行什么操作，要把层级理清楚）；每层操作时什么是相同的。<br>
+<a href="https://www.luogu.com.cn/problem/P1010">幂次方</a><br>
+<img src="https://s111z.github.io/post-images/1698386619039.png" alt="" loading="lazy"><br>
+题目大意：给定一个数n，我们将它拆成若干个2的幂相加，例如：<br>
+137=2<sup>7+2</sup>3+2^0<br>
+7=2<sup>2+2+2</sup>0<br>
+3=2+2^0<br>
+用2(c）表示2的c次幂<br>
+所以137=2(2(2)+2+2(0))+2(2+2(0))+2(0)<br>
+我们要使拆解后幂最高的只到2，请输出拆解后的结果。<br>
+思路：我们以137为例，第一次拆解即将它转化成二进制，然后再对拆出来的指数进一步拆解，拆解过程也是将它转成二进制。那么我们就可得到这是一层一层深入，一点一点将问题化小的过程，就是分治。<br>
+关于分治，不需要考虑函数的具体细节，我们只要明确函数能实现什么功能，并正确调用即可。所以关键在于，明确在不断分小的过程中，什么操作是相同的，递归函数的意义就是来实现这一相同操作。对于这道题，相同的操作就是拆解成二进制的过程，因为对不合适的指数进行拆解也是将其进行二进制拆解。<br>
+落实到这道题，有些细节需要处理一下，首先是拆解的过程，得到的二进制数上的01值是从右往左的，但是我们想要的输出是从左往右的，那么就需要将拆解结果先存一下，然后按照我们想要的顺序进行循环。另外在输出的时候涉及到括号和加号，需要判断一下在什么位置怎么输入比较好。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int s[100];
+void ct(int k)//2^k
+{
+	if(k==0) 
+	{
+		cout&lt;&lt;&quot;0&quot;;
+		return;
+	}
+	if(k==1)
+	{
+		cout&lt;&lt;&quot;&quot;;
+		return;
+	}
+	if(k==2)
+	{
+		cout&lt;&lt;&quot;2&quot;;
+		return;
+	}
+	int i=0;
+	vector&lt;int&gt;p;//因为要从大到小
+	while(k)
+	{
+		if(k%2) p.push_back(i);
+		i++;
+		k /= 2;
+	}
+	for(int i=p.size()-1;i&gt;=0;i--)
+	{
+		if(i!=p.size()-1) cout&lt;&lt;&quot;+&quot;;
+		cout&lt;&lt;&quot;2&quot;;
+		if(p[i]!=1)cout&lt;&lt;&quot;(&quot;;
+		ct(p[i]);
+		if(p[i]!=1)cout&lt;&lt;&quot;)&quot;;
+	}
+}
+int main()
+{
+	//这个题关键在于理解题目，第一次分是将原数转成二进制，第二次分是将指数转成二进制，第三次……
+	//本质上都是将数转成二进制
+	int n;
+	cin&gt;&gt;n;
+	int t=n;
+	ct(n);
+}
+</code></pre>
+<h2 id="点分治">点分治</h2>
+<p>这里一定要好好补一下这个题，上回为了一个题熬到半夜还是在上回。<br>
+言归正传，来讨论下这道题。<br>
+<a href="https://www.luogu.com.cn/problem/P3806">【模板】点分治 1</a><br>
+题目大意：给定一棵有n个点的树，询问树上距离为k的点对是否存在。(有m个询问)<br>
+数据范围：n &lt; 1e4,m &lt; 100<br>
+思路：这道题有两个卡点，一个是点分治，另一个是对询问的处理。<br>
+点分治：<br>
+对于这道题，暴力的解法就是对每个点进行dfs，不用多想，一定会超时。那么我们就要考虑优化，这里的优化是从树的重心开始访问，树上的点的距离分为两类，一类是跨过重心的，一种是在重心的同一侧，即在同一支路上。跨过重心的就是两个点到根节点的距离相加，不跨过重心的情况，我们可以对这条支路分治，把它转化为跨过重心的情况。那么问题就转化成了如何对跨过重心的情况进行处理。我们的处理方式是找出重心，计算所有点到重心的距离，将这些距离写入dis[],对dis排序，然后用尺取法（双指针）统计出和为k的有多少对，当然，这样的话，在一条支路上的会被误统计进去，因为我们只从数值上进行考虑，同一支路上的点距离不能这么算，对此，我们的解决办法就是，对于重心的每一个子节点进行一次同样的getans()处理，再用前面的结果减去这里得到的结果。<br>
+对询问的处理，这里才是卡点，我们按照上面的叙述，很容易将代码写成对于每一个询问都建一遍树，但是实际上，这样会超时，所以我们的处理是，用一个数组来记录询问，同时用一个数组ans来记录每个询问的答案，getans()函数再加一个自变量sign，对于重心的查找时，让sign=1，里面每次等于k的时候，ans[i]+=sign;对于重心子节点查找时，让sign=-1,里面每次等于k的时候，ans[i]-=sign;这样就是实现了ans[]的统计，我们只用在主函数中执行一次fz(),在getans()中遍历ask[]数组，进而获取ans[]。然后遍历ans[],如果ans[i]非0，就判是，否则判否。<br>
+每一块函数:<br>
+找重心：</p>
+<pre><code class="language-cpp">void getroot(int u,int fa)//x为当前点，fa为父亲节点
+{
+    f[u]=0,siz[u]=1;//f表示这个点最大子树的大小，siz是这个点子树大小的和
+    for(int i=h[u];i!=-1;i=ne[i])//枚举儿子
+      {
+      	int y=e[i];
+      	if(use[y]||y==fa) continue;//use表示之前遍历过了，这里没啥用
+      	getroot(y,u);//往下遍历
+      	siz[u]+=siz[y];
+      	f[u]=max(f[u],siz[y]);//更新f
+      	
+      }
+    f[u]=max(f[u],Siz-siz[u]);//Siz表示在现在这棵子树中点的总数，开始时Siz=n，除了枚举的儿子所在的子树外，还有一棵子树是上面的那一堆，容斥原理
+    if(f[u]&lt;mx) 
+	{
+		mx=f[u];
+		rt=u;//更新root
+	}
+}
+</code></pre>
+<p>获得到根节点的距离</p>
+<pre><code class="language-cpp">void getd(int x,int fa)
+{
+	dis[++cnt]=d[x];//d[x]实际上可以通过增加一个自变量来替换，主要是记录x点对应的长度，这个长度是在上一层中得到的，所以要么增加一个自变量传入函数，要么用全局变量d[]来记录。
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j==fa||use[j]) continue; 
+		d[j]=d[x]+w[i];
+		getd(j,x);
+	}
+}
+</code></pre>
+<p>获得ans[]</p>
+<pre><code class="language-cpp">void getans(const int &amp;x,int w,const int sign)
+{
+	cnt=0;
+	d[x]=w;
+	getd(x,0);
+	sort(dis+1,dis+1+cnt);
+	for(int i=1;i&lt;=m;i++)//这里就是遍历处理询问
+	{
+		int l=1,r=cnt;
+		while(l&lt;r)//用二分优化一下也行，但对于这题没那么必要
+		{
+			if(dis[l]+dis[r]&lt;=ask[i])
+			{
+				if(dis[l]+dis[r]==ask[i]) ans[i] += sign;
+				++l;
+			}
+			else --r;
+		}
+	}
+}
+</code></pre>
+<p>分治函数</p>
+<pre><code class="language-cpp">void fz(const int &amp;x)//x就是重心
+{
+	use[x]=1;
+	getans(x,0,1);
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(use[j]) continue;
+		getans(j,w[i],-1);
+		Siz=siz[j],mx=1e9+7;
+		getroot(j,x);
+		fz(rt);	
+	}
+}
+</code></pre>
+<p>完整代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+
+const int N=10005;
+const int INF=10000005;
+int k;
+int h[40010],e[40010],ne[40010],w[40010],idx;
+int use[20010];
+int d[20010],dis[N];
+int f[20010],siz[20010];
+int cnt,Siz,rt=1;
+int ans[N];
+int mx=1e9+7;
+int n,m;
+int ask[N];
+void add(const int &amp;a,const int &amp;b,const int &amp;c)
+{
+	w[idx]=c,e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+	w[idx]=c,e[idx]=a,ne[idx]=h[b],h[b]=idx++;
+}
+//求重心
+void getroot(int u,int fa)//x为当前点，fa为父亲节点
+{
+    f[u]=0,siz[u]=1;//f表示这个点最大子树的大小，siz是这个点子树大小的和
+    for(int i=h[u];i!=-1;i=ne[i])//枚举儿子
+      {
+      	int y=e[i];
+      	if(use[y]||y==fa) continue;//use表示之前遍历过了，这里没啥用
+      	getroot(y,u);//往下遍历
+      	siz[u]+=siz[y];
+      	f[u]=max(f[u],siz[y]);//更新f
+      }
+    f[u]=max(f[u],Siz-siz[u]);//Siz表示在现在这棵子树中点的总数，开始时Siz=n，除了枚举的儿子所在的子树外，还有一棵子树是上面的那一堆，容斥原理
+    if(f[u]&lt;mx) 
+	{
+		mx=f[u];
+		rt=u;//更新root
+	}
+}
+
+//求到重心的距离
+void getd(int x,int fa)
+{
+	
+	dis[++cnt]=d[x];
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j==fa||use[j]) continue; 
+		d[j]=d[x]+w[i];
+		getd(j,x);
+
+	}
+}
+//求答案
+void getans(const int &amp;x,int w,const int sign)
+{
+	cnt=0;
+	d[x]=w;
+	getd(x,0);
+	sort(dis+1,dis+1+cnt);
+	for(int i=1;i&lt;=m;i++)
+	{
+		int l=1,r=cnt;
+		while(l&lt;r)
+		{
+			if(dis[l]+dis[r]&lt;=ask[i])
+			{
+				if(dis[l]+dis[r]==ask[i]) ans[i] += sign;
+				++l;
+			}
+			else --r;
+		}
+	}
+
+}
+//分治划分
+
+void fz(const int &amp;x)//x就是重心
+{
+	use[x]=1;
+	getans(x,0,1);
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(use[j]) continue;
+		getans(j,w[i],-1);
+		Siz=siz[j],mx=1e9+7;
+		getroot(j,x);//找子树中的重心
+		fz(rt);	
+	}
+}
+
+signed main()
+{
+	f[0]=1e9+7;
+	memset(h,-1,sizeof h);
+
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+	for(int i=0;i&lt;n-1;i++)
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		add(a,b,c);
+	}
+
+	Siz=n;
+	getroot(1,1);
+	int root=rt;
+	for(int i=0;i&lt;=n;i++)use[i]=0;
+	for(int i=1;i&lt;=m;i++)
+	{
+		scanf(&quot;%d&quot;,&amp;ask[i]);
+	}
+	fz(root);
+	for(int i=1;i&lt;=m;i++)
+	{
+		if(ans[i]&gt;0) printf(&quot;AYE\n&quot;);
+		else printf(&quot;NAY\n&quot;);
+	}
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/acdc16/">
+              <h3 class="post-title">
+                ACDC16
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

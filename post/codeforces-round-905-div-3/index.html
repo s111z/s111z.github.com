@@ -1,0 +1,181 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Codeforces Round 905 (Div. 3) | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Codeforces Round 905 (Div. 3)
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-22 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/1883/problem/A">Morning</a><br>
+题目大意：键盘上的数按照“1234567890”排列，每次只能进行移动光标或者选择这两种操作之一，求输入一个四位数的PIN码至少需要操作多少次。（光标最开始在1处）<br>
+思路：就是个模拟题，思路很简单，将PIN码转化成int[]，用一个变量来表示光标当前位置，然后遍历int[]即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		string s;
+		cin&gt;&gt;s;
+		int a[5];
+		for(int i=0;i&lt;s.size();i++)
+		{
+			if(s[i]=='0') a[i]=10;
+			else
+			a[i]=s[i]-'0';
+		}
+		int c=0,k=1;
+		for(int i=0;i&lt;4;i++)
+		{
+			c += abs(a[i]-k)+1;
+			k=a[i];
+		}
+		cout&lt;&lt;c&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1883/problem/B">Chemistry</a><br>
+题目大意：给定一个长为n的字符串s和一个整数k，问能否在恰好删除k个字符的情况下，使s删除重排后为回文串，空字串也是回文串。<br>
+思路：这题的核心在于字符串中每个字符出现次数的奇偶性，最多只能有一个为奇数，那那么只用统计字符数为奇数的有多少个，个数&lt;=k，就可以，因为个数小于等于k就可以将所有字符的个数都变成偶数，那么此时（k-个数）为奇数还是为偶数都可以成立；个数==k+1其实也可，删完只留一个，为奇数的，也可以构成回文串；个数&gt;k+1的话，删完至少剩俩为奇数的，一定不可以。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+    int t;
+    cin&gt;&gt;t;
+    while(t--)
+    {
+        int n,k;
+        string s;
+        scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+        cin&gt;&gt;s;
+        map&lt;char,int&gt;mp;
+        for(int i=0;i&lt;s.size();i++) mp[s[i]]++;
+        int c=0;
+        for(auto it:mp)
+        {
+            if(it.second%2) c++;
+        }
+        if(c&gt;k+1) printf(&quot;NO\n&quot;);
+        else printf(&quot;YES\n&quot;);
+    }
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1883/problem/C">Raspberries</a><br>
+题目大意：我们给定一个数组a，对于一个操作，就是挑一个ai,然后ai++;我们给定一个数k，要求至少操作多少次，使得最后ai的的乘积可以整除k；<br>
+思路：实际上很简单，2&lt;=k&lt;=5,想要整除，数组中一定有能够整除它的数，我们只用写一个循环，计算出每一个数要想整除它需要操作多少次，取最小值即可，另外对于4，单独处理一下，因为数组中如果</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/codeforces-round-904-div-2/">
+              <h3 class="post-title">
+                Codeforces Round 904 (Div. 2)
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

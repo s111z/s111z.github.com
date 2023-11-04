@@ -1,0 +1,463 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Codeforces Round 903 (Div. 3) | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Codeforces Round 903 (Div. 3)
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-14 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/1881/problem/A">Don't Try to Count</a><br>
+题目大意：给定两个字符串，一个x,一个s,我们可以对x进行积累操作（即x += x）,我们需要判断s能否成为x的子串<br>
+思路：这道题的思路其实十分简单，就写个循环累加x,每累加一次就进行判断，判否的退出条件就是x的长度大于s的2倍。不过要注意，一定要先累加再判断，累加操作相当于将x的首尾连起来，产生新的顺序，实际上累加一次就不会再出现新的序列了，但是因为s的长度可能远大于x，所以需要累加到s的2倍比较靠谱,（如果仅累加到等长，s可能并不从x的第一个字符开始就跟它匹配）。但是x要是比s长，那么先判断的话就不会进行累加，那就没有新序列，所以要先累加再判断。另外找子串可以用find()，更简单。<br>
+find()找子串的代码：</p>
+<pre><code class="language-cpp">//在a中找b
+if(a.find(b)!=string::npos) printf(&quot;YES&quot;);
+else printf(&quot;NO&quot;);
+</code></pre>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n,m;
+		cin&gt;&gt;n&gt;&gt;m;
+		string x,s;
+		cin&gt;&gt;x&gt;&gt;s;
+	
+		if(x.find(s)!=string::npos) //先找一遍，如果找到自然不用再累加
+		{
+			printf(&quot;0\n&quot;);
+			continue;	
+		}
+		else
+		{	
+			x += x;
+			int i=1;
+			while(1)//这里还可以用do-while来写，因为我们要先执行再判断
+			{
+					if(x.find(s)!=string::npos) 
+					{
+						printf(&quot;%d\n&quot;,i);
+						break;
+					}
+				    if(x.size()&gt;2*s.size()) 
+				    {
+					    printf(&quot;-1\n&quot;);
+					    break;
+				    }
+				    x += x;
+				    i++;
+			}
+		}
+	}
+}
+</code></pre>
+<p>do-while写法：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namepsace std;
+int main()
+{
+    int t;
+    cin&gt;&gt;t;
+    while(t--)
+    {
+        int n,m;
+        cin&gt;&gt;n&gt;&gt;m;
+        string x,s;
+        cin&gt;&gt;x&gt;&gt;s;
+        if(x.find(s)!=string::npos) printf(&quot;0\n&quot;);
+        else 
+        {
+            int i=0;
+            do{
+                i++;
+                x+=x;
+            if(x.find(s)!=string::npos)
+            {
+                printf(&quot;%d\n&quot;,i);
+                break;
+            }
+            if(x.size()&gt;2*s.size()) 
+            {
+                printf(&quot;-1\n&quot;);
+                break;
+            }
+            }while(1);
+        }
+    }
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1881/problem/B">Three Threadlets</a><br>
+题目大意：给定三个数，我们定义一次划分操作为：将一个数a分成b,c，使得b+c=a；我们对这三个数最多只能进行3次划分操作，问最终能否使它们的全变成相同的数<br>
+思路：这道题我们分情况讨论，我们假定三个数分别为x,y,z；<br>
+当x=y=z时，一次操作也不用进行；<br>
+当x=y!=z时，要分成两种小情况，<br>
+z大于x,那么要使最后所有的数都一样，我们就要对z进行划分，那么z最后要划分成几个等于x的数，那么z一定要是x的倍数，而且我们简单推理可知，2倍的时候需要划分一次，3倍的时候需要划分两次，4倍的时候需要划分3次，所以z最多只能是x的4倍；<br>
+z小于x,那么就要将x和y划分成几个z，因为x,y相等，所以对它们的操作数是一样的，因为总操作数不能超过3，所以，x和y只能是z的两倍；<br>
+x!=y!=z,这种情况，肯定也是最小的不动，因为总共就三刀，最小的一定不能动，否则刀数一定会超。那么就是切另外两个，由情况2推出来的规律可知，切的刀数和倍数有关，那么我们就是说，首先要满足倍数关系，然后y/x+z/x&lt;=4，然后就ok了。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[4];
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		scanf(&quot;%d%d%d&quot;,&amp;a[1],&amp;a[2],&amp;a[3]);
+		sort(a+1,a+4);//方便第二种和第三种情况的大小比较
+		if(a[1]==a[2]&amp;&amp;a[2]==a[3]) printf(&quot;YES\n&quot;);
+		else if(a[1]==a[2]&amp;&amp;a[2]!=a[3])//两个小的等
+		{
+			if(a[3]%a[2]==0)
+			{
+				int q=a[3]/a[2]-1;
+				if(q&lt;=3) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+			else printf(&quot;NO\n&quot;);
+		}
+		else if(a[1]!=a[2]&amp;&amp;a[2]==a[3])
+		{
+			if(2*a[1]==a[3]) printf(&quot;YES\n&quot;);
+			else printf(&quot;NO\n&quot;);
+		}
+		else
+		{
+			if(a[2]%a[1]==0&amp;&amp;a[3]%a[1]==0)
+			{
+				int q=a[2]/a[1]+a[3]/a[1]-2;
+				if(q&lt;=3) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+			else printf(&quot;NO\n&quot;);
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1881/problem/C">Perfect Square</a><br>
+题目大意：给定几个偶数级的矩阵，规定该矩阵顺时针转90度后如果与原矩阵完全相同，就称这个矩阵为合法矩阵，另外规定一次操作是将一个位置上的字母按照字母表顺序变成它后面的一个字母，问要将一个矩阵变成合法矩阵最少需要进行几次操作<br>
+思路：这道题一定要注意操作的意义，观察图可发现，因为旋转，所以每四个元素相当于轮换了一次，那么就是说，对应位置的四个元素必须相同，我们将四个位置的元素位置写出来：<br>
+(x,y)--(y,n-x+1)--(n-x+1,n-y+1)--(n-y+1,x)<br>
+就是遍历，然后每次判这四个元素，相不相等，如果相等就不用操作，如果不相等就统计每种字母出现的个数，并找出最大的字母，然后先计算需要多少次操作，再将这四个字母全改成我们找到的最大的字母。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+char s[1010][1010];
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%s&quot;,s[i]+1);
+		long long ans=0;
+		for(int x=1;x&lt;=n;x++)
+		{
+			for(int y=1;y&lt;=n;y++)
+			{
+				if(s[x][y]==s[y][n-x+1]&amp;&amp;s[y][n-x+1]==s[n-x+1][n-y+1]&amp;&amp;s[n-x+1][n-y+1]==s[n-y+1][x]) continue;
+				else
+				{
+					map&lt;char,int&gt;mp;
+					mp[s[x][y]]++;
+					mp[s[y][n-x+1]]++;
+					mp[s[n-x+1][n-y+1]]++;
+					mp[s[n-y+1][x]]++;
+					char st;
+					for(auto it:mp) st=it.first;
+
+					ans += (long long)(st-s[x][y]);
+					ans += (long long)(st-s[y][n-x+1]);
+					ans += (long long)(st-s[n-x+1][n-y+1]);
+					ans += (long long)(st-s[n-y+1][x]);
+					s[x][y]=s[y][n-x+1]=s[n-x+1][n-y+1]=s[n-y+1][x]=st;
+				}
+			}
+		}
+		cout&lt;&lt;ans&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1881/problem/D"> Divide and Equalize</a><br>
+题目大意：给定一个长为n的数组，我们每次可以进行如下操作：<br>
+挑选两个元素ai,aj；<br>
+取ai的一个因数x;<br>
+ai/=x,aj*=x;<br>
+问最后能否使这个数组中所有的元素都相同，如果可以，我们就输出YES，否则输出NO<br>
+思路：这道题很巧妙，因为要找因数，所以想到分解质因数，质因数可以凑因数，当对一个合法样例进行分解质因数后可以发现，每个质因子的指数的和是n的倍数,我们取因数可以就取质因数，一个数的质因数少一个，另外的就多一个，然后就全部匀开了。<br>
+另外这里进行一个优化，分解质因数的时候，我们不需要从2开始按顺序遍历，即不用模板来写，我们先预处理一个质因数数组，然后遍历这个数组来进行质因数的拆分，这样减少了一些无效访问，会快很多。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+vector&lt;int&gt;p;
+int st[1000010];
+int main()
+{
+
+    for (int i = 2; i &lt;= 1000010; i ++ )
+    {
+        if (!st[i])  p.push_back(i);
+        for (auto it:p)
+        {
+			if(it &gt; 1000010 / i) break;
+            st[it * i] = 1;
+            if (i % it == 0) break;
+        }
+    }
+    int t;
+    cin&gt;&gt;t;
+    while(t--)
+    {
+    	int n;
+    	scanf(&quot;%d&quot;,&amp;n);
+    	map&lt;int,int&gt;mp;
+    	for(int i=0;i&lt;n;i++)
+    	{
+    		int x;
+    		scanf(&quot;%d&quot;,&amp;x);
+    		int j=0;
+			while(x!=1)
+			{
+				if(x%p[j]==0)
+				{
+					while(x%p[j]==0)
+					{
+						mp[p[j]]++;
+						x/=p[j];
+					}
+				}
+				else j++;
+			}
+		}
+		int flag=1;
+		for(auto it:mp)
+		{
+			if(it.second%n!=0)
+			{
+				flag=0;
+				break;
+			}
+		}
+		if(flag) printf(&quot;YES\n&quot;);
+		else printf(&quot;NO\n&quot;);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1881/problem/E">Block Sequence</a><br>
+题目大意：给定一个数组a[],我们定义完美数组是：可以将这个数组分成若干块，每一块的第一个数表示个数，后面有这么多个数。我们一次操作可以删除一个数，问至少需要进行多少次操作，才能使数组a变成完美数组。<br>
+思路：其实最初的思路是对的，只是没有考虑全面，对一个数，它后面的数字个数如果比它小，那么这个数就需要删掉，但是要考虑后面个数比它大，但是可以不删的情况，所以相当于我们要考虑每个位置删和不删两种情况，从后往前进行递推。这里不好想的就是不删的情况，实际上不删就是要从这里划一块然后我们就要看下一块的开头位置，来计算操作数。<br>
+我们定义的d数组表示，如果以当前这个数开头，那么需要删多少个，首先就要考虑这个数被删掉的情况，然后考虑它合法的情况。另外一定要从后往前访问，因为当前如果可以的话，我们就要考虑后面的那一组，所以从后往前更新。<br>
+这道题有多种不同的状态，我们要理清楚状态转移的过程，我们讨论的就是是否以某个数开头，如果从前往后访问，那么当前访问的元素，可能被它前面的元素包含进去了，同时我们也无法进行状态的更新，因为这个状态需要通过它前面合法的那种情况更新而来，但我们由当前数的值只能定，它后面可以包含多少个，而不知道它前面可以包含多少个，如果我们从后往前访问，后面的被更新了，我们只用从后面对应的状态来更新当前值即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[200010],d[200010];
+int main()
+{
+    int t;
+    cin&gt;&gt;t;
+    while(t--)
+    {
+        int n;
+        cin&gt;&gt;n;
+        memset(d,0,sizeof d);
+        for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+        d[n]=1;
+        for(int i=n-1;i&gt;=1;i--) 
+        {
+            d[i]=d[i+1]+1;
+            if(a[i]&lt;=n-i)d[i]=min(d[i],d[i+a[i]+1]);
+        }
+        cout&lt;&lt;d[1]&lt;&lt;endl;
+    }
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1881/problem/F">Minimum Maximum Distance</a><br>
+题目大意：给定一张无向图，标记其中的一些节点，然后给定一个数组f[],f[i]表示节点i到最远标记点的距离。我们要求的是f[]中的最小值。<br>
+思路：先给出结论，我们先找出距离最远的两个标记点，并求出它们之间的距离d，最小值就是d/2;下面进行证明：<br>
+1.为什么要找两标记点的距离以及为什么是d/2:<br>
+<img src="https://s111z.github.io/post-images/1697425472956.png" alt="" loading="lazy"><br>
+如图所示，a,b被标记，c,d没有被标记，我们要求的是f[]中的最小值，显然f[d]&lt; f[c],再抽象一点，d在ab的路径上，而c不在，所以我们要找两标记点，因为它们路径上的点才能得到最小值；至于d/2，因为f[i]取的是最大值，所以一定是中间的那个点才能取到最小的。<br>
+2.为什么要找最长的标记点路径<br>
+<img src="https://s111z.github.io/post-images/1697426051072.png" alt="" loading="lazy"><br>
+如图所示，我们可以看到有三个被标记的点:a,b,c，如果我们取了a,b，可以发现f[d]是d到c的距离，进而我们可以推知，如果我们取的不是最长的，那么这条路径上的点的f[i]甚至不是到a或者到b的，那么取中间得到的距离都不在f[]中，自然无意义。<br>
+如此便证明了我们想要的最大值数组中的最小值就是:(标记点间的最大距离d)/2<br>
+写到这儿，就有有一个新问题产生，图是无向图，那么我们该如何求标记点间的最大距离，因为我们初始并没有f[],只有一张无向图。<br>
+<img src="https://s111z.github.io/post-images/1697426798209.png" alt="" loading="lazy"><br>
+如上图，因为一个点有多条分枝，所以我们从一个点开始搜，无论是dfs还是bfs，都会漏掉，起点不同分支间经过起点可以得到的值，显然这个值要大于从起点开始的最大值，要解决这个问题，我们实际上只用从找到的最远点再搜一遍即可。这样就可以搜到原起点的不同分支。<br>
+推广一下，这个搜两遍的方法也可以用来求任意一张无向图中不规定起止点的最大距离。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int mark[200010],d[200010];
+int h[200010],e[400010],ne[400010],idx;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+void dfs(int k)
+{
+    for(int i=h[k];i!=-1;i=ne[i])
+    {
+            int j=e[i];
+            if(d[j]==-1)//该点没被访问过。因为是无向图，所以要标记一下
+            {
+                d[j]=d[k]+1;
+                dfs(j);
+            }
+    }
+    //循环运行结束会自动返回，不需要额外写return
+}
+int main()
+{
+    int t;
+    cin&gt;&gt;t;
+    while(t--)
+    {
+        memset(h,-1,sizeof h);
+        int n,m;
+        scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+        for(int i=1;i&lt;=m;i++) scanf(&quot;%d&quot;,&amp;mark[i]);
+        for(int i=1;i&lt;n;i++)
+        {
+            int a,b;
+            scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+            add(a,b),add(b,a);
+        }
+        memset(d,-1,sizeof d);
+        d[mark[1]]=0;
+        dfs(mark[1]);
+        int mx=0,e;
+        for(int i=1;i&lt;=m;i++)
+        {
+            if(d[mark[i]]&gt;mx)
+            {
+                mx=d[mark[i]];
+                e=i;
+            }
+        }
+        memset(d,-1,sizeof d);
+        d[e]=0;
+        dfs(e);
+        for(int i=1;i&lt;=m;i++) mx=max(mx,d[mark[i]]);
+        cout&lt;&lt;(mx+1)/2;//这里我们画两个图讨论一下就会发现需要加上1再除2，才能得到我们想要的距离。
+    }
+}
+
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/bfs-yu-zui-duan-lu-suan-fa-zhong-st-shu-zu-de-yi-yi-tao-lun/">
+              <h3 class="post-title">
+                bfs与最短路算法中st数组的意义讨论
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

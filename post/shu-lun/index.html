@@ -1,0 +1,362 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>数论 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              数论
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h3 id="质数">质数</h3>
+<p>定义：在大于1的整数中，因数只包含1和本身的数叫质数</p>
+<p>判质数</p>
+<p>1.试除法</p>
+<p>最朴素的做法：直接暴力循环</p>
+<pre><code class="language-cpp">//判断n是否是质数
+int flag=1;
+for(int i=2;i&lt;n;i++)
+{
+    if(n%i==0)
+    {
+        flag=0;
+        break;
+    }
+}
+if(flag) printf(&quot;yes&quot;);
+else printf(&quot;no&quot;);
+</code></pre>
+<p>优化：因数是成对出现的，所以循环到i * i &lt; n即可，但是i&gt;=1e5的时候，i * i就有溢出风险，所以我们用 i&lt;n/i 作为判断条件，这样绝对不hi溢出。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">for(int i=2;i&lt;=n/i;i++)
+{
+    if(n%i==0)
+    {
+        flag=0;
+        break;
+    }
+}
+if(flag) printf(&quot;yes&quot;);
+else printf(&quot;no&quot;);
+</code></pre>
+<p>2.分解质因数</p>
+<p>朴素思路：循环，当遇上可以被n整除的数的时候，就用n不断的除掉它，然后记录除的次数即可。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">for(int i=2;i&lt;=n;i++)
+{
+    int s=0;
+    while(n%i==0)
+    {
+        s++;
+        n /= i;
+    }
+    printf(&quot;%d %d&quot;,i,s);
+}
+</code></pre>
+<p>优化：有一个定理，数n最多有一个大于更号n的质因数，所以可以简化我们的循环</p>
+<pre><code class="language-cpp">for(int i=2;i&lt;n/i;i++)
+{
+    int s=0;
+    while(n%i==0)
+    {
+        n/=i;
+        s++;
+    }
+    printf(&quot;%d %d&quot;,i,s);
+}
+if(n) printf(&quot;%d 1&quot;,n);
+</code></pre>
+<p>筛法求质数</p>
+<p>思路：循环，对于每一个访问到的数，删掉它的整数倍，最后剩下的数就是质数</p>
+<p>代码：</p>
+<pre><code class="language-cpp">int st[];
+vector&lt;int&gt;p;
+for(int i=2;i&lt;=n;i++)
+{
+    if(!st[i]) p.push_back(i);
+    for(int j=i+1;j&lt;=n;j+=i) st[j]=1;
+}
+</code></pre>
+<p>优化：不用删除所有数的整数倍，只用删掉质数的整数倍即可。（埃氏筛法）<br>
+时间复杂度O(nloglogn)<br>
+代码：</p>
+<pre><code class="language-cpp">int st[];
+vector&lt;int&gt;p;
+for(int i=2;i&lt;=n;i++)
+{
+    if(!st[i]) 
+    {
+        p.push_back(i);
+        for(int j=i+1;j&lt;=n;j+=i) st[j]=1;
+    }
+}
+</code></pre>
+<p>质数定理：1到n当中有(n/ln(n))个质数</p>
+<p>线性筛法：原理一个合数有且只有一个最小质因数，我们就用这个最小质因数来筛掉它，这样就能保证每个数只被筛一次，就满足了线性的要求</p>
+<pre><code class="language-cpp">for(int i=2;i&lt;=n;i++)
+    {
+        if(!st[i]) p.push_back(i);
+        for(auto t:p)
+        {
+            if(t&gt;n/i) break; //用t*i来筛数，所以要满足这个条件，否则得到的数就要超过n的范围
+            st[t*i]++;
+            if(i%t==0) break;
+            //如果t比i的最小质因数还大，那么例如i=4,t=3,那么12就会被筛掉，但实际上i=6,t=2时12会被筛掉，这样12就被筛了两次，不符合线性
+            //这种算法的原理是一个数只会被它的最小质因数筛掉，一个合数一定有且仅有最小质因数，这样每个数只被筛一次，就符合线性的要求
+        }
+    }
+</code></pre>
+<h3 id="约数">约数</h3>
+<p>1.求一个数的所有约数<br>
+就用试除法，循环来实现，优化就是i&lt;=n/i</p>
+<pre><code class="language-cpp">for(int i=1;i&lt;=n/i;i++)
+{
+    if(n%i==0)
+    {
+        p.push_back(i);
+        if(n/i!=i) push_back(n/i);
+    }
+}
+</code></pre>
+<p>2.求约数个数（int范围内，约数最多的一个数有1500个约数）<br>
+原理：利用分解质因数的原理来考虑，N=a1^k1 * a2^k2 * ... * an^kn<br>
+约数的个数cnt=(k1+1) * (k2+1) * ... * (kn+1)//就是选几个的问题</p>
+<p>3.求约数的和<br>
+原理：跟求约数的个数的原理类似，不过求解的式子有变化(a1<sup>0+a1</sup>1+...+a1<sup>k1)(...)(an</sup>0+an<sup>1+...+an</sup>kn),将式子展开就能得到每个约数相加（对于每个括号内的可以用秦九韶来优化）</p>
+<p>4.求两个数的最大公约数（辗转相除法）（对于多个数就两两求）<br>
+时间复杂度O(logn)<br>
+gcd(a,b)=gcd(b,a mod b)</p>
+<h3 id="欧拉函数">欧拉函数</h3>
+<p>欧拉函数：1-n中，与n互质（两个数的最大公约数是1）的数的个数<br>
+公式：f(n)=n(1-1/a1)(1-1/a2)...(1-1/an)(a是n的质因数)<br>
+计算原理是容斥原理：<br>
+<img src="https://cdn.luogu.com.cn/upload/image_hosting/z37eqm4d.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="欧拉函数计算原理" loading="lazy"></p>
+<p>给定n个数，求每个数的欧拉函数，时间复杂度O(n * sqrt(ai))</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    while(n--)
+    {
+        int a;
+        scanf(&quot;%d&quot;,&amp;a);
+        int res=a;
+        for(int i=2;i&lt;=a/i;i++)
+        {
+            if(a%i==0) 
+            {
+                res=res/i*(i-1);//如果先乘可能会爆int
+                while(a%i==0) a /= i;
+            }
+        }
+        if(a&gt;1) res = res/a*(a-1);
+        printf(&quot;%d\n&quot;,res);
+    }
+}
+</code></pre>
+<p>筛法求欧拉函数</p>
+<p>这里我们求的是1-n中每个数欧拉函数个数的和，求每个数的欧拉函数时，我们用到了线性筛法的原理<br>
+先来看线性筛法的模板</p>
+<pre><code class="language-cpp">    for(int i=2;i&lt;=n;i++)
+    {
+        if(!st[i]) p.push_back(i);
+        for(auto t:p)
+        {
+            if(t&gt;n/i) break;
+            st[i*t]++;
+            if(i%t==0) break;//t再大就不能控制t是将要筛掉的数的最小质因数了，也就不能保证算法是线性的了
+        }
+    }
+</code></pre>
+<p>在式子中，我们想要求每个数的欧拉函数，可发现每次循环最多可以访问到3类数，<br>
+第一类数：质数，质数p的欧拉函数是[1,p-1]；</p>
+<p>第二类数，合数：合数又分两种：</p>
+<p>一种是i%t<mark>0时的合数：<br>
+t * i的质因子由t的质因子和i的质因子构成，t的质因子只有本身，i%t</mark>0时，我们考虑i的质因数就已经把t考虑进去了，所以：<br>
+<img src="https://cdn.luogu.com.cn/upload/image_hosting/tcr5npp0.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="" loading="lazy"></p>
+<p>另一种是i%t!=0时的合数：<br>
+同样t * i的质因子是由t的质因子和i的质因子构成的，t的质因子只有本身，这里t不是i的质因子，所以要额外增加一个t，即：<br>
+<img src="https://cdn.luogu.com.cn/upload/image_hosting/kgfc1eh0.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="" loading="lazy"></p>
+<p>那么对于每次循环能访问到的数，我们就将其欧拉函数算出来了，按照线性筛法的原理，我们这里的计算也是线性的。代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int st[1000010],o[1000010];
+vector&lt;int&gt;p;
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    o[1]=1;
+    for(int i=2;i&lt;=n;i++)
+    {
+        if(!st[i]) 
+        {
+            p.push_back(i);
+            o[i]=i-1;
+        }
+        for(auto t:p)
+        {
+            if(t&gt;n/i) break;
+            st[i*t]++;
+            if(i%t==0)
+            {
+                o[i*t]=t*o[i];
+                break;
+            }
+            else
+            {
+                o[i*t]=o[i]*(t-1);
+            }
+        }
+    }
+    long long res=0;
+    for(int i=1;i&lt;=n;i++) res += o[i];
+    cout&lt;&lt;res;
+}
+</code></pre>
+<p>欧拉定理、费马小定理及证明：<br>
+<img src="https://cdn.luogu.com.cn/upload/image_hosting/1420nnxh.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="" loading="lazy"></p>
+<h3 id="快速幂">快速幂</h3>
+<p>求a的b次方mod p的结果。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+
+int qmi(int a,int b,int p)
+{
+    int res=1;
+    while(b)
+    {
+        if(b&amp;1) res = (long long)res*a%p;
+        b &gt;&gt;= 1;
+        a = (long long)a*a%p;
+    }
+    return res;
+}
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    while(n--)
+    {
+        int a,b,p;
+        scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;p);
+        cout&lt;&lt;qmi(a,b,p)&lt;&lt;endl;
+    }
+}
+</code></pre>
+<p>res = (long long)res * a%p;先将res转成longlong类型，然后再乘上a,防止溢出，但是右边计算后的结果是int范围内的，再将它赋值给int是没有影响的</p>
+<h3 id="扩展欧几里得算法">扩展欧几里得算法</h3>
+<h3 id="中国剩余定理">中国剩余定理</h3>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/shu-wei-tong-ji-dp/">
+              <h3 class="post-title">
+                数位统计dp
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

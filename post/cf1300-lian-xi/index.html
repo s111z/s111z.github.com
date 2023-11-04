@@ -1,0 +1,178 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>cf1300练习 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              cf1300练习
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-22 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/problemset/problem/1560/D">Make a Power of Two</a><br>
+题目大意：给定一个数字，我们可以对其进行两个操作:<br>
+1.在其左右添加字符<br>
+2.从任意位置抹掉字符<br>
+我可进行任意次操作，要使操作后的数是2的任意次幂。<br>
+思路：这道题在看到这两个操作的时候就应该与字符串匹配联系起来，事实上，确实是字符串匹配，我们将数字转化成字符串，预处理出来2的任意次幂对应的字符串，然后进行匹配，取最小值即可。另外要注意，2的幂最好处理的大一点。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+string s[100];
+#define int long long
+string zh(int m)
+{
+	string s;
+	while(m)
+	{
+		s+=m%10+'0';
+		m /= 10;
+	}
+	reverse(s.begin(),s.end());
+	return s;
+}
+signed main()
+{
+	int t=1ll;
+	int k=0;
+	while(1)
+	{
+		s[k++]=zh(t);
+		if(t&gt;2e18) break;
+		t *= 2;
+	}
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n;
+		cin&gt;&gt;n;
+		string s1=zh(n);
+		int mi=100000000;
+		for(int i=0;i&lt;k;i++)
+		{
+			int x=0,y=0,c=0;
+			while(x&lt;s1.size()&amp;&amp;y&lt;s[i].size())
+			{
+				if(s1[x]==s[i][y]) c++,y++;
+				x++;
+				//s1会被遍历，因为其中和s[i]不等的字符会被擦掉
+			}
+			c = s1.size()-c+s[i].size()-c;
+			//s1.size()是被擦掉的字符，s[i].size()-c是要添加的字符
+			mi=min(mi,c);
+		}
+		cout&lt;&lt;mi&lt;&lt;endl;;
+	}
+}
+</code></pre>
+<p>上述代码中的zh()还可被替换成to_string()<br>
+ps:string s[]与vector<string>类似</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/cmian-xiang-dui-xiang/">
+              <h3 class="post-title">
+                c++面向对象
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

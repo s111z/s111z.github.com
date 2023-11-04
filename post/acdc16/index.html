@@ -1,0 +1,749 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ACDC16 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              ACDC16
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-25 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/876/problem/B">Divisiblity of Differences</a><br>
+题目大意：有一个大小为n的多集，我们要从中选k个数，使得任意两数之差可以整除m，问是否成立。<br>
+思路：任意两数之差可以整除m，仔细想想就会发现，只要它们模m的结果相同即可。所以我们需要做的就是统计，每个数模上k后的值，然后统计每个余数对应的数有几个，如果个数大于等于k，那么就成立。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+vector&lt;int&gt;p[100010];
+int main()
+{
+	int n,k,m;//n是数组个数，k是需要挑的个数，m是除数
+	scanf(&quot;%d%d%d&quot;,&amp;n,&amp;k,&amp;m);
+	map&lt;int,int&gt;mp;
+	for(int i=0;i&lt;n;i++)
+	{
+		int x;
+		scanf(&quot;%d&quot;,&amp;x);
+		mp[x%m]++;
+		p[x%m].push_back(x);//因为要输出原数，所以还是要记一下
+	}
+	int f=-1;
+	for(auto t:mp)
+	{
+		if(t.second&gt;=k)
+		{
+			f=t.first;
+			break;
+			
+		}
+	}
+	if(f==-1) printf(&quot;No&quot;);
+	else 
+	{
+		printf(&quot;Yes\n&quot;);
+		int c=0;
+		for(auto it:p[f])
+			{
+				cout&lt;&lt;it&lt;&lt;&quot; &quot;;
+				c++;
+				if(c==k) break;
+			}
+	}
+	
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1217/problem/A">Creating a Character</a><br>
+题目大意：我们给定数字st，it表示角色初始的力量和智慧，现在有n个技能点，可以分给力量和智慧，我们现在要求能够创造出多少个不同的角色，st和it只要有一个不同就算不同。另外要求st严格大于it，算一个合格的角色，只有合格才算角色。<br>
+思路：这道题切忌st和it都关注，我们只要关注一个量，求出其上下限即可。这里我们看st，上限是将n全部分给它，下限是st+es-1=it+n-es,但是要注意有st远小于it的情况，即st+n&lt;=it，这种直接判否就可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int st,it,n;
+		scanf(&quot;%d%d%d&quot;,&amp;st,&amp;it,&amp;n);
+		if(st+n&lt;=it)
+		{
+			printf(&quot;0\n&quot;);
+		}
+		else
+		{
+			int c=it+n+1-st;
+			//cout&lt;&lt;&quot;c=&quot;&lt;&lt;c&lt;&lt;endl;
+			int x=ceil(c*1.0/2);
+			//cout&lt;&lt;&quot;x=&quot;&lt;&lt;x&lt;&lt;endl;
+			x=max(x,0);
+			cout&lt;&lt;n-x+1&lt;&lt;endl;
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/762/problem/A">k-th divisor</a><br>
+题目大意：给定两个数n、k，要求n的第k小的因数。<br>
+思路：第一种方法是暴力；第二种方法是对顶堆，但实际上是没必要的；</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+signed main()
+{
+	int n,k;
+	scanf(&quot;%lld%lld&quot;,&amp;n,&amp;k);
+	set&lt;int&gt;s;
+	for(int i=1;i&lt;=n/i;i++)
+	{
+		if(n%i==0) s.insert(i),s.insert(n/i);
+	}
+	if(s.size()&gt;=k) 
+	{
+		vector&lt;int&gt;a;
+		for(auto t:s) a.push_back(t);
+		printf(&quot;%lld\n&quot;,a[k-1]);
+	}
+	else printf(&quot;-1\n&quot;);
+}
+</code></pre>
+<p>//set最大能放268435455个元素，差不多是2e8，再大就要考虑别的数据结构了。</p>
+<p><a href="https://codeforces.com/contest/1513/problem/C">Add One</a><br>
+题目大意：给定一个数n，每次操作将每一位数加1，得到一个新的数，然后继续进行操作，总共操作k次，问最后得到的数有多少位。（例 对19进行一次操作，得到210）<br>
+思路1：每一位上的数字实际上都是0-9，那我们干脆从10开始找规律：我们对10进行次数讨论：<br>
+d[i]表示进行i次操作后的位数<br>
+次数i：<br>
+0-8：d[i]=2;<br>
+9：d[i]=3;<br>
+i&gt;9:d[i]=d[i-1]+d[i-2];<br>
+这里实际上需要多写一些找规律。<br>
+实际上单纯 找规律，不容易推出来，详细的思路见思路2后<br>
+实现1：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int dp[200010];
+const int mod=1e9+7;
+int main()
+{
+	for(int i=0;i&lt;9;i++) dp[i]=2;
+	dp[9]=3;
+	for(int i=10;i&lt;=200010;i++) dp[i]=dp[i-9]+dp[i-10],dp[i]%=mod;
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,m;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		int ans=0;
+		while(n)
+		{
+			int x=n%10;
+			if(x+m &gt;= 10) ans += dp[x+m-10];		
+			else  ans += 1;
+			ans %= mod;
+			n /= 10;
+		}
+		printf(&quot;%d\n&quot;,ans);
+	}
+}
+</code></pre>
+<p>思路2：d[i][j]//对i进行j次操作<br>
+i只能取0-9的数，<br>
+当进行的操作不会让这个数升位的时候，就是1；如果让这个数变成10，那么就用<br>
+d[i][j]=(d[0][i+j-10]+d[1][i+j-10])%mod;<br>
+来计算长度，d[0][]、d[1][]会随着次数的增加而改变。</p>
+<pre><code class="language-cpp">//by czy
+#include&lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+int t,dp[10][200015],n,m,res;
+signed main()
+{
+	ios::sync_with_stdio(false);cin.tie(0);cout.tie(0);
+	for(int i=0;i&lt;10;++i)
+	{
+		dp[i][0]=1;
+	}
+	for(int i=1;i&lt;200010;++i)
+	{
+		for(int j=0;j&lt;=9;++j)
+		{
+			if(i+j&lt;=9)
+			{
+				dp[j][i]=1;
+			}
+			else
+			{
+				dp[j][i]=(dp[0][i+j-10]+dp[1][i+j-10])%1000000007;
+			}
+		}
+	}
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		cin&gt;&gt;n&gt;&gt;m;
+		res=0;
+		while(n)
+		{
+			res=res+dp[n%10][m];
+			res=res%1000000007;
+			n=n/10;
+		}
+		cout&lt;&lt;res&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p>思路1和思路2实际上是差不多的，这道题的关键在于不要考虑加后能得到什么，而是去考虑加后能有多少位，这才是关键，那么关于数字我们只考虑0-9就行，当操作次数会让它升位时，就将它单独列出来，然后第二个思考点就是，如何升位，首先它加到10的时候就会升成2，然后后面如果还需要操作就是对10进行的，那就等价于对0和1进行操作，但此时操作数已经减小，因为要先变成10，对0和1的操作又回到刚刚，操作次数会不会让它升位，不升位就是1，升位就是再对0和1进行操作，操作数进一步减小，依次类推就会发现本质上是不断划分成操作数更小的0和1，然后进行操作。那么实际上我们只考虑对0，1的操作次数就行，然后不断累计,所以由此产生优化：(这样优化后数据范围可以再扩大一点)</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+int t,dp[10][200015],n,m,res;
+signed main()
+{
+	for(int i=0;i&lt;2;++i)
+	{
+		dp[i][0]=1;
+	}
+	//dp[i][j] i表示对哪个数进行操作，j表示操作多少次
+	for(int i=1;i&lt;200010;++i)//操作次数
+	{
+		for(int j=0;j&lt;2;++j)//哪个数
+		{
+			if(i+j&lt;=9)
+			{
+				dp[j][i]=1;
+			}
+			else
+			{
+				dp[j][i]=(dp[0][i+j-10]+dp[1][i+j-10])%1000000007;
+			}
+		}
+	}
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		res=0;
+		while(n)
+		{
+			int x=n%10;
+			if(x+m&lt;10) res+=1;
+			else res += (dp[0][x+m-10]+dp[1][x+m-10])%1000000007;
+			res=res%1000000007;
+			n=n/10;
+		}
+		printf(&quot;%d\n&quot;,res);
+	}
+}
+</code></pre>
+<p>思路3：暴力</p>
+<p><a href="https://codeforces.com/contest/1385/problem/D">a-Good String</a><br>
+题目大意：给定一个字符串s,我们定义c-good串：前半段或者后半段是全是字符c,另外半段是c+1-good串，如“cdbbaaaa”：<br>
+cdbb aaaa<br>
+cd bb<br>
+c d<br>
+可以不断分成两段，可发现分成的两段是满足题目要求的。<br>
+我们一次操作可以更改一个字母，我们要求的是将s变成a-good串，最少需要多少次操作。<br>
+思路：这道题很明显是分治，从中间分，不断把子串分小。我们需要修改，从第一次分开始看，第一次分后得到两段，我们需要看看是将前半段统一成a，还是将后半段统一成a,这里有两个需要考虑的因素，一个是前半段需要修改多少个元素，一个是后半段需要修改多少个元素，对每种情况的前后求和，然后取最小值即可，划分之后计算过程一样，那么直接递归调用这个计算函数即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int fz(string s,char c)
+{
+	if(s.size()==1) return s[0]!=c;//等于就返回0，不用更改
+	
+	int mid=s.size()/2;//必须从中间分 abcd n=2^k，那么就是说这里永远是整数
+	int q=fz(string(s.begin(),s.begin()+mid),c+1);//这里s.begin()+mid实际上不会算进前一半
+	q += mid-count(s.begin()+mid,s.end(),c);
+	
+	int h=fz(string(s.begin()+mid,s.end()),c+1);
+	h += mid-count(s.begin(),s.begin()+mid,c);
+	
+	return min(q,h);
+}
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		string s;
+		cin&gt;&gt;n&gt;&gt;s;
+		int ans=fz(s,'a');
+		cout&lt;&lt;ans&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1475/problem/F">Unusual Matrix</a><br>
+题目大意：我们给定一个n阶矩阵，矩阵的元素只含0和1，我们规定两种操作：1.将一整行的数全部取异或；2.将一整列的数全部取异或（异或的意义实际就是将0变成1或者将1变成0）。我们给定两个矩阵a,b；问能否通过操作将a变成b。<br>
+思路：这道题看似麻烦，既要进行行变化又要进行列变化，但实际上行列的变化顺序对结果不产生影响，如果可以就是可以，就那么多操作，操作顺序怎样都可以；如果不可以就是不可以。那么我们只要指定一种操作顺序，然后判断可不可以就行。<br>
+而这里我们指定的操作顺序为：先遍历第一行，如果a，b中对应的元素不相同，那么就将一整列进行操作；遍历结束之后，再遍历第一列，如果对应元素不相同，那么就将对应的一整行进行操作，这样所有的行列都根据要求进行了操作。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a1[2000][2000];
+int b[2000][2000];
+int a2[2000][2000];
+int n;
+int check1()//先进行列变化
+{
+	for(int i=0;i&lt;n;i++)
+	{
+		if(a1[0][i]!=b[0][i])
+		{
+			for(int j=0;j&lt;n;j++)
+			{
+				
+				a1[j][i] ^= 1;
+			}
+		}
+	}
+
+	
+	//行变化
+	for(int i=0;i&lt;n;i++)
+	{
+		int it=(a1[i][0]^b[i][0]);
+		for(int j=1;j&lt;n;j++)
+		{
+			if(it!=(a1[i][j]^b[i][j])) return 0;
+		}
+	}
+	return 1;
+}
+
+int check2()
+{
+
+	for(int i=0;i&lt;n;i++)
+	{
+		if(a2[i][0]!=b[i][0])//遍历第一列
+		{
+			for(int j=0;j&lt;n;j++)
+			{
+				a2[i][j] ^= 1;
+			}
+		}
+	}
+	//列变化
+	for(int i=0;i&lt;n;i++)
+	{
+		int it=(a2[0][i]^b[0][i]);
+		for(int j=1;j&lt;n;j++)
+		{
+			if(it!=(a2[j][i]^b[j][i])) return 0;
+		}
+	}
+	return 1;
+}
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		cin&gt;&gt;n;
+		for(int i=0;i&lt;n;i++)
+		{
+			string s;
+			cin&gt;&gt;s;
+			for(int j=0;j&lt;n;j++)
+			{
+				a1[i][j]=s[j]-'0';
+				a2[i][j]=s[j]-'0';
+			}
+		}	
+		for(int i=0;i&lt;n;i++)
+		{
+			string s;
+			cin&gt;&gt;s;
+			for(int j=0;j&lt;s.size();j++)
+			{
+				b[i][j]=s[j]-'0';
+			}
+		}	
+		
+		if(check1()) printf(&quot;YES\n&quot;);
+	//	else if(check2()) printf(&quot;YES\n&quot;);
+		else printf(&quot;NO\n&quot;);
+	}
+	
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1167/problem/B">Lost Numbers</a><br>
+题目大意：交互题，给定6个数-4,8,15,16,23,42，我们通过4次询问，每次询问可以询问任意两个数的乘积，进而得出它的顺序。<br>
+思路：这道题我们从1开始，每次询问a[i]*a[i+1],然后找出15或者23的位置，然后就可以进一步将前五个数推出，然后再看哪个数没有出现，就将这个数填在第六位。这道题的推理很简单，难点在于交互，交互<br>
+的意思是，由你给输入，但是输入被写在cout区域，oj给出输出，但输出写在cin区。</p>
+<pre><code class="language-cpp">cout&lt;&lt;&quot;?&quot;&lt;&lt;&quot; &quot;&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt; i+1 &lt;&lt;endl;//进行输入
+</code></pre>
+<pre><code class="language-cpp">scanf(&quot;%d&quot;,&amp;ans);//获取系统输出
+</code></pre>
+<pre><code class="language-cpp">fflush(stdout);//刷新输出区
+</code></pre>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int a[]={0,4,8,15,16,23,42};
+	int ans;
+	int res[10];
+	int sres[10];
+	memset(res,-1,sizeof res);
+	memset(sres,-1,sizeof sres);
+	for(int i=1;i&lt;=4;i++)
+	{
+		cout&lt;&lt;&quot;?&quot;&lt;&lt;&quot; &quot;&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;i+1&lt;&lt;endl;
+		fflush(stdout);
+		scanf(&quot;%d&quot;,&amp;ans);
+		res[i]=ans;
+	}
+	int flag=1;
+	for(int i=1;i&lt;4;i++)
+	{
+		if(res[i]%23==0&amp;&amp;res[i+1]%23==0) //23在中间
+		{
+			sres[i+1]=23;
+			sres[i]=res[i]/23;
+			sres[i+2]=res[i+1]/23;
+			int t=i+2;
+			while(t&lt;=4)
+			{
+				sres[t+1]=res[t]/sres[t];
+				t++;
+			}
+			t=i-1;
+			while(t&gt;=1)
+			{
+				sres[t]=res[t]/sres[t+1];
+				t--;
+			}
+			flag=0;
+		}
+		if(res[1]%23==0&amp;&amp;res[2]%23!=0)//23在开头
+		{
+			sres[1]=23;
+			int t=2;
+			while(t&lt;=5)
+			{
+				sres[t]=res[t-1]/sres[t-1];
+				t++;
+			}
+			flag=0;
+		}
+		if(res[i]%15==0&amp;&amp;res[i+1]%15==0) //15在中间
+		{
+			sres[i+1]=15;
+			sres[i]=res[i]/15;
+			sres[i+2]=res[i+1]/15;
+			int t=i+2;
+			while(t&lt;=4)
+			{
+				sres[t+1]=res[t]/sres[t];
+				t++;
+			}
+			t=i-1;
+			while(t&gt;=1)
+			{
+				sres[t]=res[t]/sres[t+1];
+				t--;
+			}
+			flag=0;
+		}
+		if(res[1]%15==0&amp;&amp;res[2]%15!=0)//15在开头
+		{
+			sres[1]=15;
+			int t=2;
+			while(t&lt;=5)
+			{
+				sres[t]=res[t-1]/sres[t-1];
+				t++;
+			}
+			flag=0;
+		}
+	}
+	if(flag)//15和23不在前四个数中
+	{
+	if(res[4]%23==0)
+	{
+		sres[5]=23;
+		int t=4;
+		while(t&gt;=1)
+		{
+			sres[t]=res[t]/sres[t+1];
+			t--;
+		}
+	}
+	if(res[4]%15==0)
+	{
+		sres[5]=15;
+		int t=4;
+		while(t&gt;=1)
+		{
+			sres[t]=res[t]/sres[t+1];
+			t--;
+		}
+
+	}
+	}
+	for(int i=1;i&lt;=6;i++)
+	{
+		if(find(sres+1,sres+6,a[i])==sres+6)
+		{
+			sres[6]=a[i];
+			break;
+		}
+	}
+	cout&lt;&lt;&quot;!&quot;&lt;&lt;&quot; &quot;;
+	for(int i=1;i&lt;=6;i++)
+	{
+		printf(&quot;%d &quot;,sres[i]);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1383/problem/B">GameGame</a><br>
+题目大意:k和朋友做游戏，两人初始分数都是0，现有一个数组a[],他们轮流从a中选一个数，然后用这个数与自己的分数进行异或，最后谁的分高，谁就赢了，如果两人分数相等就平局，问k的状态。<br>
+思路：这道题的核心在与谁的谁的最高位1所在的位数最高（当然这里所说的最高位是从前往后访问，两者不相等的第一位），最开始都是0，所以不影响最高位1，那么我们就统计a[]中每一个数的每一位是否为1，最后得到两个数组，f0[],f1[],表示第i位0或1的个数。然后从前往后访问数组。如果1的个数是偶数，那么一人一半，没什么影响，1<sup>0=1,0</sup>0=0,剩下的0无论怎么分都不影响；假设没有0或者偶数个0，如果1的个数是奇数，如果为3，7，11，……那么一人一个，最后一个肯定分给k，而且此时之前两个人都是1，那么朋友就赢了；如果是5，9，……，那么在分给k之前都是0，那么k胜利；据此写出代码,在循环中判输赢，如果没盘判出来就输出平局。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		int a0[40],a1[40];
+		memset(a0,0,sizeof a0);
+		memset(a1,0,sizeof a1);
+		for(int i=1;i&lt;=n;i++)
+		{
+			int x;
+			scanf(&quot;%d&quot;,&amp;x);
+			for(int j=30;j&gt;=0;j--)
+			{
+				if(x&gt;&gt;j&amp;1) a1[j]++;
+				else a0[j]++;
+			}
+		}
+		int flag=1;
+		for(int i=30;i&gt;=0;i--)
+		{
+			if(a1[i])
+			{
+				if(a1[i]%4==3&amp;&amp;a0[i]%2==0) 
+				{
+					printf(&quot;LOSE\n&quot;);
+					flag=0;
+					break;
+				}
+				else if(a1[i]%2)//如果能整除2，一人一个这样分，最高位相同就没有比较的意义了
+				{
+					printf(&quot;WIN\n&quot;);
+					flag=0;
+					break;
+				}
+				
+			}
+		}
+		if(flag) printf(&quot;DRAW\n&quot;);
+	}
+}
+</code></pre>
+<p>ps:涉及到位运算的题目，就将数视为二进制数来考虑</p>
+<p><a href="https://codeforces.com/contest/1611/problem/D">Weights Assignment For Tree Edges</a><br>
+题目大意：给定一个数组b[],b[i]表示i的父节点；我们要赋一个dist[]数组，dist[i]表示从根节点到i路径上所有点的点权和，要求dist[root]=0,同时给定一个数组p[],要求dist[p[i]]&lt; dist[p[i+1]]，最后输出每个点的点权。<br>
+思路：按照dist[]的定义，一定可以得到dist[父]小于dist[子]，我们按照p[]的顺序来给dist[]赋值，在赋值之前判断一下它的父节点的dist有没有被赋值，如果没被赋值，那么就直接输出-1，因为如果父在p中的位置在子后面，赋到的值就比子大，是不符合dist定义的。在输出点权的时候，我们对于每个点只要输出dist[父]-dist[i]就可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int b[200010],p[200010],dist[200010];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;b[i]);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;p[i]);
+		memset(dist,-1,sizeof dist);
+		if(p[1]!=b[p[1]])//因为要按照p的顺序来赋值，所以p[1]必须是根节点
+		{
+			printf(&quot;-1\n&quot;);
+			continue;
+		}
+		dist[p[1]]=0;
+		int flag=1;
+		for(int i=2;i&lt;=n;i++)
+		{
+			if(dist[b[p[i]]]==-1) 
+			{
+				printf(&quot;-1\n&quot;);
+				flag=0;
+				break;
+			}
+			dist[p[i]]=dist[p[i-1]]+1;
+		}
+		if(flag) 
+		{
+			for(int i=1;i&lt;=n;i++)
+			{
+				printf(&quot;%d &quot;,dist[i]-dist[b[i]]);
+			}
+			printf(&quot;\n&quot;);
+		}
+		
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1334/problem/C">Circle of Monsters</a><br>
+题目大意：n个角色，站成一圈，每个角色的血量为a，它死后会对下一个角色产生b的暴击，我们每次开枪只能对一个角色产生一点伤害，我们要求至少需要开几枪可以杀死所有角色。<br>
+思路：这道题是贪心题，思路比较巧，我们将一个角色的血量分成两部分，一部分是被暴击所伤的，一部分是需要补的枪数，如果被暴击所伤的大于自己的血量就不用补枪。我们考虑两种极端的情况，全都可以被暴击杀死，那么总的补枪数就是0，我们只要挑一个血量最少的开枪，就是最小开枪数；全都不能被暴击杀死，那么补枪数累加之后再加上最小暴击就可，因为它需要补枪的那一部分已经被考虑了，再加上暴击就可以杀死第一个，触发暴击。核心在于，第一个杀谁。<br>
+<img src="https://s111z.github.io/post-images/1698336859626.png" alt="" loading="lazy"><br>
+由上图，所有怪兽都分为以上两种情况，然后对于第一个打的一定是二选一的，选第一个就要打a[i]枪，选后一个就要打b[i]枪，肯定选小的。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+#define forn(i, n) for (int i = 0; i &lt; int(n); ++i)
+typedef long long li;
+const int N = 300 * 1000 + 13;
+int n;
+li a[N], b[N];
+void solve() 
+{
+	scanf(&quot;%d&quot;, &amp;n);
+	forn(i, n) scanf(&quot;%lld%lld&quot;, &amp;a[i], &amp;b[i]);//a是血量，b是暴击伤害
+	li ans = 0, mn = 1e18;
+	forn(i, n)//[0,n-1] 
+	{
+		int ni = (i + 1) % n;//算下一个是谁
+		li val = min(a[ni], b[i]);//下一个的血量和当前这个的暴击去min
+		ans += a[ni] - val;
+		//a[ni]&gt;=b[i],val=b[i],打完当前这个要打死下一个还需要几枪
+		//a[ni]&lt;b[i],打下个需要补0枪
+		mn = min(mn, val);
+		//val全等于a[ni],只要打死一个，就全死了，那就打死a[i]最小的即可
+		//全为b[i]的话，补枪全部已经算上，但是第一个的暴击无处可来，但是它的a已经被加了一部分了，剩下一部分就是它被暴击的，我们再加上即可
+		//混合其实同理，每一个都分为被暴击和补枪两部分，
+		//val=a[ni]就是说，可以被暴击杀死，但是暴击可能不会被触发，那么就需要手动开枪
+		//val=b[ni]就是说，不能被暴击杀死，需要补枪，但补枪部分同一加了，也是可能无法开始暴击，需要手动开枪
+		//但是a[ni]的其中一部分已经被加上了，只用把另一部分加上即可，这部分刚好是暴击。4
+	}
+	ans += mn;
+	printf(&quot;%lld\n&quot;, ans);
+}
+
+int main() {
+	int T;
+	scanf(&quot;%d&quot;, &amp;T);
+	forn(i, T)
+		solve();
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/acm-xun-lian-ji-hua/">
+              <h3 class="post-title">
+                ACM训练计划
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

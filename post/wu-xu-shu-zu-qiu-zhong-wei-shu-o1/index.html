@@ -1,0 +1,155 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>无序数组求中位数（O(1)） | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              无序数组求中位数（O(1)）
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-08 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>此类题目一般是给定一个无序的数组，在录入的过程中，不断询问中位数（这是题目本质，当然不同的题目表述的意思不同，不过大体都是这个意思。）<br>
+有四种算法<br>
+1.定义一个vector&lt;&gt;,每次插入数字前先用upper_bound()或者lower_bound()查找，再用insert（）插入。</p>
+<pre><code class="language-cpp">vector&lt;int&gt;a;
+while()
+{
+    int num;
+    cin&gt;&gt;num;
+    auto it=lower_bound(a.begin(),a.end(),num);//lower_bound()不仅可以用来查vector,也可以用在数组中
+    a.insert(it,num);
+}
+</code></pre>
+<p>2.multiset<br>
+维护两个multiset的结构s1,s2，两个都是从小到大排的，所以我们只需要将保证s1.size()&gt;s2.size(),s1.size()-s2.size()&lt;=1,同时 <em>\s2.begin()&gt;=  *s1.rbegin();那么</em>s1.rbegin()一定是中位数</p>
+<pre><code class="language-cpp">multiset&lt;int&gt;s1,s2;
+while()//录入数组的过程
+{
+    cin&gt;&gt;num;
+    if(!s1.size()||num&lt;*s1.rbegin()) s1.insert(num);
+    else s2.insert(num);
+}
+while(s1.size()&gt;s2.size()+1)
+{
+    s2.insert(*s1.rbegin());
+    s1.erase(--s1.end())//s1.rbegin()不能当作迭代器用在erase中
+}
+while(s1.size()&lt;s2.size())
+{
+    s1.insert(*s2.begin());
+    s2.erase(s2.begin());
+}
+</code></pre>
+<p>3.对顶堆</p>
+<p>4.平衡树查询第K名</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/shu-ju-ku/">
+              <h3 class="post-title">
+                数据库
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

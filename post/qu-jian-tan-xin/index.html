@@ -1,0 +1,134 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>区间贪心 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              区间贪心
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h3 id="1区间选点最大不相交区间数量">1.区间选点&amp;最大不相交区间数量</h3>
+<p>这两类问题虽然一个求最大一个求最小，但实际上，思路一致。</p>
+<p>区间选点即选尽量少的点，使之落在尽可能多的区间内，先按照右端点进行从小到大的排序，选右端点，只要下一个区间包含这个点，那么就不用再选新的点，直到访问到不包含这个点的区间，然后要选一个新的点。（这里有个变化就是开区间和闭区间，涉及边界的处理。）</p>
+<p>-最大不相交区间的数量，也是先按照右端点进行排序，然后然后进行访问，找到不包含右端点的区间就更新答案。</p>
+<h3 id="2区间分组">2.区间分组</h3>
+<p>给定一些区间，将这些区间进行分类，使组内的区间没有交集。这个要按照左端点进行排序，然后记录每组的最右端点，需要用到一个小根堆，将每组的最右端点放入，针对每次访问到的区间，先将该区间的左端点与已分好组的最小的最右端点进行比较，如果小于等于这个的最小端点那么一定不可以放入，任何一个已经分好的区间（证明如下），就必须单独为它开一个新组，否则就可以将它放入已经分好的区间，如果可以放入多组中随便挑一组就好，这里我们将它放入第一组，再更新第一组的最右端点。</p>
+<p>证明：这里的特殊情况就是，这段区间的左端点在第一组中，但是右端点在第二组的最左端点前面，这种情况是不成立的，因为这两组既然被分成两组就证明两组是相交的，而且我们先按照左端点进行了排序，所以这个左端点一定在第二组左端点的后面，但同时又在第一组右端点的左边，那么一定与这两个区间相交，所以我们需要新开一个区间。</p>
+<h3 id="区间覆盖">区间覆盖</h3>
+<p>这类题就是先给一个大区间，然后给一些小区间，问最少选几个区间可以将大区间覆盖，如果不能将大区间覆盖就输出-1</p>
+<p>解法：选择一个小区间时，如果有多个区间可以包含大区间的左端点，那么就挑右端点最靠后的，因为我们要选的是最小数量，然后沿用这个思路，每次挑完后将大区间的st更新为所选小区间的右端点。</p>
+<h3 id="huffan树">Huffan树</h3>
+<p>这种题就是合并问题，好几堆东西，合并时消耗的体力是两堆的和，问最少消耗的体力。</p>
+<p>解法就是，将所有的数放入小根堆，每次合并最小的两个。</p>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/er-fen/">
+              <h3 class="post-title">
+                二分
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

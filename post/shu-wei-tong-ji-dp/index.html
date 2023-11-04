@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>数位统计dp | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              数位统计dp
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://www.acwing.com/problem/content/340/">计数问题</a></p>
+<p>题目概括：给定两个数a,b，求[a,b]之间[0,9]出现的次数。（当然a,b不确定大小关系,为方便表述这么写，写题的时候记得处理一下就好）</p>
+<p>思路:先求出[1,a]和[1,b]中每个数出现的次数，然后相减即可，类似前缀和的思路。那我们现在就转化成求[1,x]中数字k出现的次数。</p>
+<p>状态表示：定义一个数组f[i][j]表示从1到i中j出现的次数</p>
+<p>状态计算：求出每一位上数字j出现的次数累加即可。</p>
+<p>我们要先进行分类，考虑一般情况，所选取的数位在这个数的中间部分（将所选的数位用t表示），abctdef,我们考虑t位是j的情况，那么相当于定了一位，讨论剩下位上数字的所有可能。我们可以按照t前面数来分类，分成两类：</p>
+<p>第一类：000-(abc-1):这一类前面的数字一共有abc种组合，而且可以保证最终的数是一定小于i的，那么t位后面的数字就可以从0-9随便填，t位后面的位数：就是t-1位，那这一类的总情况就是abc * 10^(t-1);</p>
+<p>第二类：abc:这一类前面的数已经定了，就要按照第t位上的数再进行分类，当第t位上的数小于我们当前想要查找的数时，是不可能成立的因为，当t位放上我们想要查找的数后，不管怎么组合得到的数一定是大于给定的数的，也即一定大于i；当第t位上的数等于我们想要查找的数时，后面数的上限就是def,因为可从000开始，那么一共就是def+1种组合；当第t位上的数字大于我们想要查找的数时，第t位一旦放上我们想要查找的数后，后面怎么放都可以，也就时10^(t-1)种情况。</p>
+<p>特殊情况讨论：</p>
+<p>当讨论的数j为0的时候，前面就不能从000开始，所以第一种情况就是(abc-1) * 10^(t-1)</p>
+<p>当我们讨论到最左端的数时，前面的数是0，第t位（当前讨论的位）就不能为0</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int count(int x,int k)
+{
+    int len=0,t=x,res=0;
+    while(t)
+    {
+        len++;
+        t /= 10;
+    }
+    for(int i=1;i&lt;=len;i++)//这个循环每一重就是统计每一位上k出现的次数 
+    {
+        int p=pow(10,i-1),l=x/p/10,r=x%p,nw=x/p%10;
+        
+        //统计k出现的次数
+        //l在(000,abc-1)之间,(000,abc-1)一共l个数，每个数对应的第i位后面都可以任意排
+        //这里就是假设第i位上的数字为k，然后讨论其他位上的数字共有多少种组合
+        if(k) res += l*p; 
+        if(!k&amp;&amp;l) res += (l-1)*p;
+        
+        //这里讨论就是当前位的数字已经确定，如果当前位的数字大于k的时候，那我们将当前位的数字定为k，后面位上可以任意放
+        if((nw&gt;k)&amp;&amp;(l||k)) res += p;
+        //l为0就意味着当前讨论的数为第一个数，当然不能为0，还有别的写法，但显然这样写最简单
+        
+        
+        //这里讨论就是当前位上数字已经确定，如果当前位的数字等于k的时候，那我们将当前位上的数字定义为k,后面位上的数字就有了一个范围限定
+        if((k==nw)&amp;&amp;(l||k)) res += r+1;
+    }
+    return res;
+}
+int main()
+{
+    int a,b;
+    while(~scanf(&quot;%d%d&quot;,&amp;a,&amp;b))
+    {
+        if(!a&amp;&amp;!b) break;
+        if(a&lt;b) swap(a,b);
+        for(int i=0;i&lt;=9;i++)
+        cout&lt;&lt;count(a,i)-count(b-1,i)&lt;&lt;&quot; &quot;;
+        cout&lt;&lt;endl;
+    }
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/ji-yi-hua-sou-suo/">
+              <h3 class="post-title">
+                记忆化搜索
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

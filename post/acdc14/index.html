@@ -1,0 +1,776 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ACDC14 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              ACDC14
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-11 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/1194/problem/C">From S To T</a><br>
+题目大意：我们现有三个字符串s,t,p，从p中挑选字符插入s中，问最终能否使字符串s和t相同</p>
+<p>思路：这道题其实很简单，我们先判断s,t的长度关系，如果s.szie()&gt;t.size(),那么无论怎样都是不成立的，如果s.size()<mark>t.size()，只有s</mark>t，才可以，否则就不可；如果s.size()&lt; t.szie(),那么就要来找需要插入哪些字符，遍历s,t用双指针的思路，用map来存需要插入的字符和数量。<br>
+这里提一点细节，</p>
+<pre><code class="language-cpp">int i=0,j=0;
+while(i&lt;s.szie()&amp;&amp;j&lt;t.size())
+{
+    if(s[i]==t[j]) i++,j++;
+    else
+    {
+        mp[t[j]]++;
+        j++;
+    }
+}
+if(i&lt;s.size())
+{
+    printf(&quot;NO\n&quot;);
+    //退出
+}
+while(j&lt;t.size())
+{
+    mp[t[j]]++;
+    j++;
+}
+//后续访问mp
+</code></pre>
+<p>另外记得再定义一个map，统计一下p中的字符</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{	
+		map&lt;char,int&gt;mp1,mp2;
+		string a,b,c;
+		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+		if(a.size()&gt;b.size()) printf(&quot;NO\n&quot;);
+		else if(a.size()==b.size())
+		{
+			if(a==b) printf(&quot;YES\n&quot;);
+			else printf(&quot;NO\n&quot;);
+		}
+		else
+		{
+			for(int i=0;i&lt;c.size();i++)
+			{
+				mp1[c[i]]++;
+			}
+			int i=0,j=0;
+			while(i&lt;a.size()&amp;&amp;j&lt;b.size())
+			{
+				if(a[i]!=b[j])
+				{
+					mp2[b[j]]++;
+					j++;
+				}
+				else i++,j++;
+			}
+			if(i&lt;a.size()) printf(&quot;NO\n&quot;);
+			else
+			{
+				while(j&lt;b.size())
+				{
+					mp2[b[j]]++;
+					j++;
+				}
+				
+				int flag=1;
+				for(auto t:mp2)
+				{
+					if(t.second&gt;mp1[t.first])
+					{
+						flag=0;
+						break;
+					}
+				}
+				if(flag) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1698/problem/C">3SUM Closure</a><br>
+题目大意：给定一个数组，规定从中任取三个元素a1,a2,a3,如果a1+a2+a3是数组中的元素，那么就称这个数组为3SUM-closed；现给定一个数组，问它是否是3SUM-closed。<br>
+思路：我们思考一下可以发现，不能有三个正数或者三个负数同时出现，否则相加就一定会超出范围。我们据此来分类：<br>
+n<mark>3，sum=a1+a2+a3,判断sum是否与某个a相等<br>
+n</mark>4,求出四个sum，然后判断每个sum是否与某个a相等，要记住，sum与a并非一一对应的关系<br>
+n&gt;=5:<br>
+因为数组中可以有0，所以这种不是一定不存在；<br>
+当全为0时，一定成立；<br>
+当有且仅有一个非0数时，一定成立；<br>
+当有两个非0数，且两者互为相反数时，一定成立（这个可以通过将数组排序，然后将首末元素相加来判断）<br>
+剩下的情况都不成立<br>
+代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[200010];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+		if(n==3)
+		{
+			int sum=a[1]+a[2]+a[3],flag=0;
+			for(int i=1;i&lt;=n;i++) 
+			{
+				if(sum==a[i])
+				{
+					flag=1;
+					break;
+				}
+			}
+			if(flag) printf(&quot;YES\n&quot;);
+			else printf(&quot;NO\n&quot;);
+		}
+		else if(n==4)
+		{
+			int sum[5];
+			sum[1]=a[1]+a[2]+a[3];
+			sum[2]=a[1]+a[2]+a[4];
+			sum[3]=a[1]+a[4]+a[3];
+			sum[4]=a[4]+a[2]+a[3];
+			sort(a+1,a+1+n);
+			int flag=0;
+			for(int i=1;i&lt;=n;i++)//未必是一一对应
+			{
+				for(int j=1;j&lt;=n;j++)
+				{
+					if(sum[i]==a[j])
+					{
+						flag++;
+						break;
+					}
+				}
+			}
+			if(flag==4) printf(&quot;YES\n&quot;);
+			else printf(&quot;NO\n&quot;);
+		}
+		//全为0，仅一个不为0也可
+		//两个不为0，且两个互为相反数
+		//若有3个不为0，那么一定有两正或两负，那么就
+		else
+		{
+			int flag=0;
+			for(int i=1;i&lt;=n;i++)
+			{
+				if(a[i]==0)
+				{
+					flag++;
+				}
+			}
+			sort(a+1,a+1+n);
+			if(n-flag&lt;=1) 
+			{
+				printf(&quot;YES\n&quot;);
+			}
+			else if(n-flag==2)
+			{
+				if(a[1]+a[n]==0) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+			else printf(&quot;NO\n&quot;);
+		}
+	}	
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/698/problem/A">Vacations</a><br>
+题目大意：Vasya在假期期间每天可以休息、比赛或健身（三选一），同时规定如下状态：<br>
+0表示今天既无比赛，健身房也不开<br>
+1表示今天有比赛，但健身房不开<br>
+2表示今天无比赛，但健身房开<br>
+3表示今天既有比赛，健身房也开<br>
+现给出n天的状态，求最少休息几天，另外连续两天不能从事一样的活动，当然休息不算活动；<br>
+思路：每天做什么有不同的选择，情况很多，不可能穷举，实际上，这是一道动态规划的题目，我们定义<br>
+d[i][j]来表示第i天从事活动j，值表示最小休息天数；然后来看状态的划分，</p>
+<pre><code>d[i][0]=min(d[i-1][0],d[i-1][1],d[i-1][2])+1;
+
+d[i][1]=d[i-1][1]+1;//如果前一天进行了1，那么当天就不可以进行1，必须休息，比如连续的1时
+d[i][1]=min(d[i-1][0],d[i][1],d[i-1][2]);
+
+d[i][2]=d[i-1][2]+1;
+d[i][2]=min(d[i-1][0],d[i-1][1],d[i][2]);
+
+另外如果今天的状态是
+1：那么d[i][2]=inf;
+2：那么d[i][1]=inf;
+//因为今天是一定不能进行这个的，所以后面不能用这个值来更新状态，所以将其设为正无穷，那么我们取min就一定用不到它们
+
+ans=min(d[n][0],d[n][1],d[n][2]);
+</code></pre>
+<p>其实状态划分最容易错的地方在于当天一定不能进行某个活动时，这个状态怎么表示<br>
+另外j可以理解成如果今天想进行活动j的最小休息天数。<br>
+代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int inf=0x3f3f3f3f;
+int a[120];
+int d[120][4];
+int smin(int a,int b,int c)
+{
+	int res=min(a,b);
+	res = min(res,c);
+	return res;
+}
+int main()
+{
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	for(int i=1;i&lt;=n;i++)
+	{
+		scanf(&quot;%d&quot;,&amp;a[i]);
+		//0是休息，1是不休息
+		if(a[i]==0)//今天是0就必须休息
+		{
+			d[i][0]=smin(d[i-1][0],d[i-1][1],d[i-1][2])+1;
+			d[i][1]=inf;
+			d[i][2]=inf;
+		}
+		else if(a[i]==1)
+		{
+			d[i][2]=inf;
+			
+			//今天当然可以休息
+			d[i][0]=smin(d[i-1][0],d[i-1][1],d[i-1][2])+1;
+			
+			//今天可以进行1
+			d[i][1]=d[i-1][1]+1;//前1天竞赛了，今天就必须休息
+			d[i][1]=smin(d[i][1],d[i-1][0],d[i-1][2]);
+		}
+		else if(a[i]==2)
+		{
+			d[i][1]=inf;
+			
+			d[i][0]=smin(d[i-1][0],d[i-1][1],d[i-1][2])+1;
+			
+			//今天可以进行2
+			d[i][2]=d[i-1][2]+1;//前1天2了，今天就必须休息
+			d[i][2]=smin(d[i][2],d[i-1][0],d[i-1][1]);
+		}
+		else
+		{
+			d[i][0]=smin(d[i-1][0],d[i-1][1],d[i-1][2])+1;
+			
+			d[i][1]=d[i-1][1]+1;
+			d[i][1]=smin(d[i][1],d[i-1][0],d[i-1][2]);
+			
+			d[i][2]=d[i-1][2]+1;
+			d[i][2]=smin(d[i][2],d[i-1][0],d[i-1][1]);
+		}
+	}
+	
+	int ans = smin(d[n][0],d[n][1],d[n][2]);
+	cout&lt;&lt;ans;
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1108/problem/D">Diverse Garland</a><br>
+题目大意：有一个花环，有三种颜色的花串起来，我们现在要将一部分花替换成别的颜色的花，要求最后能保证1~n,位置相邻的花，颜色不同，问最少需要修改多少次。<br>
+思路：这道题就是暴力，循环访问2~(n-1),判断当前花与两边的颜色是否相同(这里看是否跟它前面的相同即可)，相同就改，最后再特判一下位置1和位置n-1的花的颜色，看看需不需要更改，其实也不用，因为2一定和1不同，判一下最后两个，然后就过了。对了，这道题如果将字母映射成数字，会更简单一点。是否满足3个颜色这个，好像不用考虑，至少在如下更新方法中不用考虑<br>
+代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	string s;
+	cin&gt;&gt;s;
+	//R1,G2,B3
+	vector&lt;int&gt;a;
+	for(int i=0;i&lt;s.size();i++)
+	{
+		if(s[i]=='R') a.push_back(1);
+		else if(s[i]=='G') a.push_back(2);
+		else a.push_back(3);
+	}
+	int c=0;
+	for(int i=1;i&lt;=n-2;i++)//访问到倒数第二个字符
+	{
+		if(a[i]==a[i-1])
+		{
+			if(a[i-1]==a[i+1])
+			{
+				if(a[i-1]==1) a[i]=2;
+				else a[i]=a[i-1]-1;
+			}
+			else
+			{
+				a[i]=6-a[i-1]-a[i+1];
+			}
+			c++;
+		}
+	}
+    if(a[n-2]==a[n-1])
+	{
+		if(a[n-2]==1) a[n-1]=2;
+		else a[n-1]=a[n-2]-1;
+		c++;
+	}
+	cout&lt;&lt;c&lt;&lt;endl;
+	for(int i=0;i&lt;n;i++)
+	{
+		if(a[i]==1) cout&lt;&lt;&quot;R&quot;;
+		else if(a[i]==2) cout&lt;&lt;&quot;G&quot;;
+		else cout&lt;&lt;&quot;B&quot;;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/898/problem/C">Phone Numbers</a><br>
+题目大意：Vasya在整理自己的通话记录，每条记录用如下格式表示：<br>
+string1 int string2,string3,...(int个)<br>
+string1表示姓名，int表示当前记录中有多少个号码，后面的字符串表示号码是什么<br>
+在记录中，每个人可以有多条记录<br>
+需要我们来将其整理一下，保证每个名字只出现一次，然后每个人可以有多个号码，但是如果x是y的后缀，那么就不算x，不同的人号码可以相同。<br>
+思路：首先要写一个判两个字符串是否有后缀关系的函数，定义一个字符串数组string s[],用map&lt;string,int&gt;mp来将人名映射成数字，方便用s[]存号码，然后对于已经记录过的人，就遍历它的s[t]看看是否新号码与原号码有后缀关系，如果没有就将其放入，如果有就跳过，对没记录的人，将它记录一下。对了，如果已经放入的号码是新号码的后缀，要将已经放入的那个弹出，然后放入新号码。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int hz(string s1,string s2)
+{
+	int res=1;
+	if(s1.size()&lt;=s2.size())//s1更小
+	{
+		for(int i=s2.size()-1,j=s1.size()-1;j&gt;=0;i--,j--)
+		{
+			if(s2[i]!=s1[j]) 
+			{
+				res=0;
+				break;
+			}
+		}
+		if(res) return 1;//是子串
+		else return 0;
+	}
+	else
+	{
+		for(int i=s2.size()-1,j=s1.size()-1;i&gt;=0;i--,j--)//s2更短
+		{
+			if(s2[i]!=s1[j]) 
+			{
+				res=0;
+				break;
+			}
+		}
+		if(res) return 2;//是子串
+		else return 0;
+	}
+	return 0;
+}
+int main()
+{
+	int n;
+	map&lt;string,int&gt;mp;
+	vector&lt;string&gt;s[30];
+	scanf(&quot;%d&quot;,&amp;n);
+	for(int i=0;i&lt;n;i++)
+	{
+		string ch;
+		int c;
+		cin&gt;&gt;ch&gt;&gt;c;
+
+		if(mp.count(ch))//查找这个人,已经有
+		{
+			auto t=mp[ch];
+			for(int j=0;j&lt;c;j++)
+			{
+				string num;
+				cin&gt;&gt;num;
+				int flag=0,cnt=0;
+				for(auto it:s[t])
+				{
+					flag=hz(it,num);
+					if(flag) break;
+					cnt++;//erase()的参数是迭代器，所以要记录该号码出现的位置
+				}
+				if(flag==0) s[t].push_back(num);
+				else if(flag==1)//it是另一个的后缀
+				{
+					s[t].erase(s[t].begin()+cnt);
+					s[t].push_back(num);
+				}
+			}
+		}
+		else
+		{
+			mp[ch]=i;
+			auto t=i;
+			for(int j=0;j&lt;c;j++)
+			{
+				string num;
+				cin&gt;&gt;num;
+				int flag=0;
+				int cnt=0;
+				if(s[t].size())
+				{
+					//是否为后缀不是单向的
+					for(auto it:s[t])
+					{
+						flag=hz(it,num);
+						if(flag) break;
+						cnt++;
+					}
+				if(flag==0) s[t].push_back(num);
+				else if(flag==1)//it是另一个的后缀
+				{
+					s[t].erase(s[t].begin()+cnt);
+					s[t].push_back(num);
+				}
+				}
+				else s[t].push_back(num);
+			}
+		}
+	}
+	cout&lt;&lt;mp.size()&lt;&lt;endl;
+	for(auto it:mp)
+	{
+		int t=it.second;
+		cout&lt;&lt;it.first&lt;&lt;&quot; &quot;;
+		cout&lt;&lt;s[t].size()&lt;&lt;&quot; &quot;;
+		for(auto num:s[t])
+		{
+			cout&lt;&lt;num&lt;&lt;&quot; &quot;;
+		}
+		cout&lt;&lt;&quot;\n&quot;;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1200/problem/C">Round Corridor</a><br>
+题目大意：一个圆分内外两层，两层之间是相通的，但是每层里面会进行分块，块与块之间是不通的，我们将内层分成n块，外层分成m块，在12点方向始终有墙，按下图来定义(x,y)<br>
+<img src="https://s111z.github.io/post-images/1696992437325.png" alt="" loading="lazy"><br>
+现有q个询问，每个询问给出x1,y1,x2,y2四个值，要求判断(x1,y1)与(x2,y2)是否相通。<br>
+思路：题目看似复杂实际很简单，我们观察可以发现，如果只看内外重合的墙，就会发现圆被分成大块，大块之间不通，但大块内部相通。所以我们只用找出它们重合的墙，然后判断给定的两个坐标是否在同一个大块内即可。<br>
+先看重合的墙：<br>
+k1*2pi/n<mark>k2*2pi/既是重合部分，<br>
+n/m=k1/k2<br>
+要求k1,k2，先求出g=gcd(n,m)，k1=n/g,k2=m/g;<br>
+k1与k2就是每大块包含的内外最小的块的数量。<br>
+用y/k就能判断前小块属于哪个大块，另外要注意，y从1开始，所以y</mark>k时应该在第0块，但是直接除就会发现它属于第一大块，那么就先y--，即可解决这个问题。<br>
+代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int gcd(int a,int b)
+{
+	return b?gcd(b,a%b):a;
+}
+signed main()
+{
+	int n,m;
+	scanf(&quot;%lld%lld&quot;,&amp;n,&amp;m);
+	int g=gcd(n,m);
+	int k1=n/g,k2=m/g;
+	int q;
+	scanf(&quot;%lld&quot;,&amp;q);
+	while(q--)
+	{
+		int x1,y1,x2,y2;
+		scanf(&quot;%lld%lld%lld%lld&quot;,&amp;x1,&amp;y1,&amp;x2,&amp;y2);
+		y1--,y2--;
+		if(x1==x2)//两坐标在同一层
+		{
+			if(x1==1)
+			{
+				if(y1/k1==y2/k1) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+			else 
+			{
+				if(y1/k2==y2/k2) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+		}
+		else//在不同层
+		{
+			if(x1==1)//x2==2
+			{
+				if(y1/k1==y2/k2) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+			else
+			{
+				if(y1/k2==y2/k1) printf(&quot;YES\n&quot;);
+				else printf(&quot;NO\n&quot;);
+			}
+		}
+		
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1263/problem/B">PIN Codes</a><br>
+题目大意：我们规定PIN密码为一个四位数的字符串，每个数都可以从0取到9，现给出n个PIN码，问至少修改多少次能使n个PIN码互不相同。<br>
+思路：这也是个很简单的题目，一旦PIN相同就修改，不同就不改，我们用map&lt;string,int&gt;mp来存PIN的个数，然后一旦有相同的写个嵌套循环来修改字符即可。注意一定要先将所有的统计出来，边输入边改会增加修改次数。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		map&lt;string,int&gt;mp;
+		string s[20];
+		for(int i=1;i&lt;=n;i++)
+		{
+			cin&gt;&gt;s[i];
+			mp[s[i]]++;
+		}
+		int c=0;
+		for(int i=1;i&lt;=n;i++)
+		{
+			if(mp[s[i]]!=1)
+			{
+				mp[s[i]]--;
+				c++;
+				for(int j=0;j&lt;4;j++)
+				{
+					int flag=0;
+					for(int k=0;k&lt;9;k++)
+					{
+						string tp=s[i];
+						tp[j]=k+'0';
+						if(!mp.count(tp))
+						{
+							s[i]=tp;
+							flag=1;
+							mp[s[i]]++;
+							break;
+						}
+					}
+					if(flag) break;
+				}
+				
+			}
+		}
+		cout&lt;&lt;c&lt;&lt;endl;
+		for(int i=1;i&lt;=n;i++)
+		{
+			cout&lt;&lt;s[i]&lt;&lt;endl;
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/25/problem/A">IQ test</a><br>
+题目大意：给定一个数组，找出奇偶性与其他元素不同的元素的下标；<br>
+思路：也很简单，定义j来记录奇数的个数，o来记录偶数的个数，另外将每次访问到的奇数和偶数的下标记录一下即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[120];
+int main()
+{
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	int o=0,j=0;
+	map&lt;int,int&gt;mp;
+	for(int i=1;i&lt;=n;i++)
+	{
+		int x;
+		cin&gt;&gt;x;
+		if(x%2) j++,mp[1]=i;
+		else o++,mp[2]=i;
+	}
+	if(j==1) cout&lt;&lt;mp[1];
+	else cout&lt;&lt;mp[2];
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1650/problem/D"> Twist the Permutation</a><br>
+题目大意：现有一个长为n的数组a[]={1,2,...,n},我们每次挑选一个下标i，将从1到i的数向右循环移动任意次。现给出结果数组，需要求出如何选择以及每个选择移动多少次。<br>
+思路：看似复杂，实际是暴力的题目。我们从n开始看，将元素逆着循环复位，同时记录移动次数，然后复位到1即可。实现就是：当前已经复位到k了，未复位的长度为len，查找数组中k的位置，然后k即该元素右移了多少（也即这len长的部分循环移动了多少），将这len长的数组逆着复位。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[2010],c[2010],tmp[2010];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		for(int i=1;i&lt;=n;i++) 
+		{
+			int x;
+			cin&gt;&gt;x;
+			c[i]=x;
+		}
+        int k=n,len=n;
+		while(k&gt;1)
+		{
+			//int ti=lower_bound(c+1,c+1+n,k)-c;//k右移ti次
+			//这个函数只能用于有序数组
+			int ti;
+			for(int i=1;i&lt;=n;i++)
+			{
+				if(c[i]==k) 
+				{
+					ti=i;
+					break;
+				}
+			}
+			if(ti!=k)
+			{
+				a[k]=ti;
+			    for(int i=ti,j=len;i&gt;=1;i--,j--) tmp[j]=c[i];
+			    for(int i=1,j=ti+1;j&lt;=len;i++,j++) tmp[i]=c[j];
+			    for(int i=1;i&lt;=len;i++) c[i]=tmp[i];
+			}
+			else a[k]=0;
+			len--,k--;
+		}
+		for(int i=1;i&lt;=n;i++) printf(&quot;%d &quot;,a[i]);
+		printf(&quot;\n&quot;);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1660/problem/C">Get an Even String</a><br>
+题目大意，给定一个字符串s，我们规定i为奇数时,si=s(i+1)为合格字符串，现要求出我们至少需要删掉多少个字符，能使s变成合格字符串。<br>
+思路：这道题不能单纯找连续字符个个数来解决，我们可以定义一个p[30]，来存每个字母是否已经出现，如果已经出现，然后再出现了这个字母，那么就可以组合成一个合法的小节，最后用s.size()-所有可用的字符数即可(统计要删多少个不方便，那么就反着考虑有多少能够保留)。要注意，如果此字符已经被访问过，且当前能组成小节，那么组好后要将所有的p再赋成0，因为中间即使有其他字符，为了组成小节，也要将它们删掉。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		string s;
+		cin&gt;&gt;s;
+		int p[30];
+		memset(p,0,sizeof p);
+		int m=0;
+		for(int i=0,j=1;i&lt;s.size();i++,j++)
+		{
+			int t=s[i]-'a'+1;
+			if(p[t]) 
+			{
+				m+=2;
+				memset(p,0,sizeof p);
+				
+			}
+			else p[t]=1;
+		}
+		cout&lt;&lt;s.size()-m&lt;&lt;endl;
+	}
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/hei-he-zi-wen-ti-zai-bu-tong-duan-dian-xia-cha-zhao-di-k-da-de-shu/">
+              <h3 class="post-title">
+                黑盒子问题——在不同断点下查找第k大的数
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

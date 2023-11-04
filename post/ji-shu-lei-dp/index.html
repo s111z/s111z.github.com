@@ -1,0 +1,168 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>计数类dp | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              计数类dp
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h3 id="整数划分">整数划分</h3>
+<p>给定的数n，n=a1+a2+...+ak,a1&gt;=a2&gt;=a3&gt;=...&gt;=ak,求合法的划分方案数</p>
+<p>思路1：将该类问题转化成完全背包问题，不同的地方在于，完全背包问题是求两种转移方式的最大值，f[j]存的是体积不超过j的最大价值，而我们这里是对两种转移方式求和，f[j]存的是和不超过j的选择方式。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int f[1010],mod=1e9+7;
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    f[0]=1;//当n=0的时候选择方案是1
+    for(int i=1;i&lt;=n;i++)
+    {
+        for(int j=i;j&lt;=n;j++)
+        {
+            f[j]=(f[j]+f[j-i])%mod;
+        }
+    }
+    cout&lt;&lt;f[n];
+}
+</code></pre>
+<p>思路2：</p>
+<p>状态表示：用f[i][j]表示总和为i，个数为j的方案，f[i][j]的值表示数量</p>
+<p>状态计算：这里的划分比较巧妙，按照每种方案中1的选与不选来划分(这样可以保证不重不漏)，如果选1，那么就将所有的方案都去掉一个1，那么就得到f[i-1][j-1],如果不选1，那就将方案中所有的数都减去一个1，就得到f[i-j][j]，将两者加起来就得到f[i][j].在得到最后答案时要注意，我们的第二维是个数，所以求最后的答案要把f[n][i]加起来.</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int f[1010][1010],mod=1e9+7;
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    //当n=0的时候选择方案是1
+    f[0][0]=1;
+    for(int i=1;i&lt;=n;i++)
+    {
+        for(int j=1;j&lt;=i;j++)
+        {
+            f[i][j]=(f[i-1][j-1]+f[i-j][j])%mod;
+        }
+    }
+    int res=0;
+    for(int i=1;i&lt;=n;i++) res = (res+f[n][i])%mod;
+    cout&lt;&lt;res;
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/qu-jian-dp/">
+              <h3 class="post-title">
+                区间dp
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

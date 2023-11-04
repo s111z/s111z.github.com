@@ -1,0 +1,469 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>二分 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              二分
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>对于要求找最大最小你值，以及待求变量具有单调性的题目都可以用二分来写</p>
+<pre><code class="language-cpp">int judge(int x)
+{}
+int main()
+{
+	...
+	int l=下界,r=上界,ans
+	while(l&lt;=r)
+	{
+   		int mid=(l+r)/2;
+		if(judge(mid)
+    		{
+        	//l或r更新
+        		ans=mid;    
+    		}
+    		else //l或r更新
+	}
+   	...
+
+}
+</code></pre>
+<p>题目</p>
+<p><a href="https://www.luogu.com.cn/problem/P1024">一元三次方程求解</a></p>
+<p>思路：根与根的绝对值大于等于1，所以在长度为1的区间里最多只有一个根，那么就可以在每个长度为1的区间内进行二分</p>
+<p>代码</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+double a,b,c,d;
+double check(double x)
+{
+    return a*x*x*x*1.0+b*x*x*1.0+c*x*1.0+d;
+}
+int main()
+{
+
+    scanf(&quot;%lf%lf%lf%lf&quot;,&amp;a,&amp;b,&amp;c,&amp;d);
+    int k=0;
+    for(int i=-100;i&lt;100;i++)
+    {
+        double l=i,r=i+1;
+        if(check(l)==0)//因为下一个i的时候会去检查当前的r
+        {
+            printf(&quot;%.2lf &quot;,l);
+            k++;
+        }
+
+        if(check(l)*check(r)&lt;0)
+        {
+            while(r-l&gt;=0.001)
+            {
+                double mid=(l+r)/2;
+                if(check(mid)*check(r)&lt;=0) l=mid;
+                else r=mid;
+            }
+            printf(&quot;%.2lf &quot;,r);
+            k++;
+        }
+        if(k==3) break;
+    }
+    return 0;
+}
+</code></pre>
+<p>ps:这道题涉及到对浮点数的二分，最后输出r，若输出mid则精度可能不够</p>
+<p><a href="https://www.luogu.com.cn/problem/P2678">跳石头</a></p>
+<p>思路：这道题要求的是移走m块石头后，最小距离最大是多少。这个最小距离的最大值是单调的，故而可以使用二分来写。另外题目保证一定有答案，故而最后不用对答案进行验证。而且因为要求的是最大的值，所以当一个值可以后要考虑更大的行不行，这样l,r更新的方式也找到了。</p>
+<p>代码</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int d,n,m;
+int a[50010];
+int check(int x)
+{
+    int i=0,now=0,t=0;
+    while(i&lt;=n)
+    {
+        i++;
+        if(a[i]-a[now]&lt;x) t++;//小于最小距离，所以要移开
+        else now=i; 
+    }
+    if(t&lt;=m) return 1;//距离要缩小
+    else return 0;
+}
+int main()
+{
+    scanf(&quot;%d%d%d&quot;,&amp;d,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+    a[n+1]=d;
+    int l=1,r=d,ans;
+    while(l&lt;=r)
+    {
+        int mid=(l+r)/2;
+        if(check(mid))
+        {
+            ans=mid;
+            l=mid+1;
+        }
+        else r=mid-1;
+    }
+    printf(&quot;%d&quot;,ans);
+}
+</code></pre>
+<p><a href="https://www.luogu.com.cn/problem/P1902">刺杀大使</a></p>
+<p>思路：这道题求的是最大伤害的最小值，那么其实我们也可以进行二分，这个题的难点其实在check函数，我们可以参考bfs的写法，反正有四个方向，如果该位置的伤害大于我们此时的伤害，那么这个点就无法到达，最后如果可以到第n行那么就返回1，否则返回0；另外l,r更新的时候也要注意，如果为1，就要考虑是否可以更小，否则就考虑是否可以更大。这道题也是保证有答案，所以最终不需要再次验证。</p>
+<p>代码</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[1010][1010];
+int dx[]={0,0,1,-1};
+int dy[]={1,-1,0,0};
+int n,m;
+int st[1010][1010];
+int check(int sx)
+{
+    memset(st,0,sizeof st);
+    queue&lt;pair&lt;int,int&gt;&gt;q;
+    q.push({1,1});
+    st[1][1]=1;
+    while(q.size())
+    {
+        auto t=q.front();
+        q.pop();
+        int x=t.first,y=t.second;
+        for(int i=0;i&lt;4;i++)
+        {
+            int nx=x+dx[i],ny=y+dy[i];
+            if(1&lt;=nx&amp;&amp;nx&lt;=n&amp;&amp;1&lt;=ny&amp;&amp;ny&lt;=m&amp;&amp;!st[nx][ny]&amp;&amp;a[nx][ny]&lt;=sx)
+            {
+                st[nx][ny]=1; 
+                if(nx==n) return 1;
+                q.push({nx,ny});
+            }
+        }
+    }
+    return 0;
+}
+int main()
+{
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+    int mx=0,mi=1000;
+    for(int i=1;i&lt;=n;i++)
+        for(int j=1;j&lt;=m;j++) 
+        {
+            scanf(&quot;%d&quot;,&amp;a[i][j]);
+            mi=min(mi,a[i][j]);
+            mx=max(mx,a[i][j]);
+        }
+    int l=mi,r=mx,ans;
+    while(l&lt;=r)
+    {
+        int mid=(l+r)/2;
+        if(check(mid))
+        {
+            ans=mid;
+            r=mid-1;
+        }
+        else l=mid+1;
+    }
+    printf(&quot;%d&quot;,ans);
+}
+</code></pre>
+<p><a href="https://www.luogu.com.cn/problem/P1314">聪明的质检员</a></p>
+<p>思路：对于这道题，要求的是|s-y|的最小值，显然不能对这个值进行二分，但是题目又说通过调整w的值，可发现w变大,y变小，w变小，y变大，也就可以二分w来实现。另外还有一个难点在于，有很多个操作区间，为了需要用到前缀和来优化。</p>
+<p>代码</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int n,m,s,sum;
+int w[200010],v[200010],l[200010],r[200010];
+int sn[200010],sv[200010];
+int check(int x)
+{
+    memset(sn,0,sizeof sn);
+    memset(sv,0,sizeof sv);
+    for(int i=1;i&lt;=n;i++) 
+    {
+        if(w[i]&gt;=x) sn[i]=sn[i-1]+1,sv[i]=sv[i-1]+v[i];
+        else sn[i]=sn[i-1],sv[i]=sv[i-1];
+    }
+    int y=0;
+    for(int i=1;i&lt;=m;i++)
+    {
+        y += (sn[r[i]]-sn[l[i]-1])*(sv[r[i]]-sv[l[i]-1]);
+    }
+    sum=abs(y-s);
+    if(y&lt;=s)  return true;
+    else return false;
+}
+signed main()
+{
+    scanf(&quot;%lld%lld%lld&quot;,&amp;n,&amp;m,&amp;s);
+    int mi=1000010,mx=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        scanf(&quot;%lld%lld&quot;,&amp;w[i],&amp;v[i]);
+        mx=max(mx,w[i]);
+        mi=min(mi,w[i]);
+    }
+    for(int i=1;i&lt;=m;i++) scanf(&quot;%lld%lld&quot;,&amp;l[i],&amp;r[i]);
+    int l=mi,r=mx,ans=0x3f3f3f3f3f3f3f3f;
+    while(l&lt;=r)
+    {
+        int mid=(l+r)/2;
+        if(check(mid)) r=mid-1;//w变小，y变大
+        else l=mid+1;
+        ans = min(sum,ans);
+    }
+    printf(&quot;%lld&quot;,ans);
+}
+</code></pre>
+<p><a href="https://www.luogu.com.cn/problem/P1083">借教室</a></p>
+<p>思路：本题的订单按顺序执行，要查找需要修改哪个订单，按照题意只需要修改一个订单，那么只要二分是1-哪个订单时无法成立即可，这里需要计算每天有多少个教室被借出，故而用差分和前缀和来处理，要注意会不会爆int</p>
+<p>代码</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int n,m;
+int d[1000010],s[1000010],t[1000010],a[1000010];
+int room[1000010],sr[1000010];
+int check(int mid)
+{
+    memset(room,0,sizeof room);
+    memset(sr,0,sizeof sr);
+    for(int i=1;i&lt;=mid;i++)
+    {
+        room[s[i]] += d[i];
+        room[t[i]+1] -= d[i];
+    }
+    for(int i=1;i&lt;=n;i++)
+    {
+        sr[i]=sr[i-1]+room[i];
+        if(sr[i]&gt;a[i]) return false;
+    }
+    return true;
+}
+signed main()
+{
+    scanf(&quot;%lld%lld&quot;,&amp;n,&amp;m);
+    for(int i=1;i&lt;=n;i++) scanf(&quot;%lld&quot;,&amp;a[i]);
+    for(int i=1;i&lt;=m;i++) scanf(&quot;%lld%lld%lld&quot;,&amp;d[i],&amp;s[i],&amp;t[i]);
+    int l=0,r=m,ans=0;
+    while(l&lt;=r)
+    {
+        int mid=(l+r)/2;
+        if(check(mid))
+        {
+            l=mid+1;
+        }
+        else
+        {
+            ans=mid;
+            r=mid-1;
+        }
+    }
+    if(ans) printf(&quot;-1\n&quot;);
+    printf(&quot;%lld&quot;,ans);
+}
+</code></pre>
+<p><a href="https://www.luogu.com.cn/problem/P4343">自动刷题机</a></p>
+<p>思路：本题要求一个最大值，要求一个最小值，所以要进行两次二分，每次二分的判断条件不同，且更新方式不同，另外本题还涉及不存在的情况，所以要判断二分出的结果是否符合要求。</p>
+<p>代码</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int n,k;
+int a[100010];
+bool check1(int mid)
+{
+    int c=0,res=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        c += a[i];
+        if(c&gt;=mid) 
+        {
+            res++;
+            c=0;
+        }
+        if(c&lt;0) c=0;
+    }
+    if(res &lt;= k)return true;
+    else return false;
+}
+bool check2(int mid)
+{
+    int c=0,res=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        c += a[i];
+        if(c&gt;=mid) 
+        {
+            res++;
+            c=0;
+        }
+        if(c&lt;0) c=0;
+    }
+    if(res &gt;= k)return true;
+    else return false;
+}
+bool check3(int mid)
+{
+    int c=0,res=0;
+    for(int i=1;i&lt;=n;i++)
+    {
+        c += a[i];
+        if(c&gt;=mid) 
+        {
+            res++;
+            c=0;
+        }
+        if(c&lt;0) c=0;
+    }
+    if(res == k)return true;
+    else return false;
+}
+signed main()
+{
+    scanf(&quot;%lld%lld&quot;,&amp;n,&amp;k);
+    int sum=0;
+    for(int i=1;i&lt;=n;i++) 
+    {
+        scanf(&quot;%lld&quot;,&amp;a[i]);
+        if(a[i]&gt;0) sum += a[i];
+    }
+    int l=1,r=sum,mi=sum,mx=0;
+    while(l&lt;=r)//最小值
+    {
+        int mid=(l+r)/2;
+        if(check1(mid))
+        {
+            r=mid-1;
+            mi=min(mi,mid);
+        }
+        else l=mid+1;
+    }
+    l=1,r=sum;
+    while(l&lt;=r)
+    {
+        int mid=(l+r)/2;
+        if(check2(mid))
+        {
+            l=mid+1;
+            mx=max(mx,mid);
+        }
+        else r=mid-1;
+    }
+    if(check3(mi)&amp;&amp;check3(mx)) printf(&quot;%lld %lld&quot;,mi,mx);
+    else printf(&quot;-1&quot;);
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/hello-gridea/">
+              <h3 class="post-title">
+                Hello Gridea
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

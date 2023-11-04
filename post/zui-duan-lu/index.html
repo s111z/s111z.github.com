@@ -1,0 +1,392 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>最短路 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              最短路
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>n表点数，m表边数<br>
+两大类情况，四种算法</p>
+<ul>
+<li>单源最短路（求一个点到其他所有点的最短距离）
+<ul>
+<li>边权都是正的
+<ul>
+<li>朴素Dijkstra算法 （O(n^2)）</li>
+<li>堆优化版的Dijkstra算法 (O(mlogn))</li>
+</ul>
+</li>
+<li>有负权边
+<ul>
+<li>Bellman-Ford  O(nm)</li>
+<li>SPFA  一般O(m) 最坏O(nm)<br>
+(如果对经过边数进行限制就不能用SPFA,只能用Bellman-Ford)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>多源汇最短路（源指起点，汇指终点，此种题有多次询问，起点终点不定）<br>
+Floyd算法O(n^3)<br>
+<img src="https://s111z.github.io/post-images/1696316100690.png" alt="" loading="lazy"></li>
+</ul>
+<p>Dijkstra：<br>
+简单来记就是，找最短，定最短，更新<br>
+类似bfs，但是bfs的边权都是1，搜的实际上是点属于哪一层，但加上边权后，同层点之间的远近也不同了，所以就要每次遍历找未被放入集合同时距离最近的点'</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m;
+int g[600][600];
+int d[600];
+bool st[600];
+int dijkstra(int k)
+{
+    memset(d,0x3f,sizeof d);
+    //void *memset(void *ptr, int value, size_t num);
+    //memset的原理是将指定内存区域中的每一个字节都赋上指定的值
+    //int占4字节，一个字节有8位，最后每一个d[i]就是00111111001111110011111100111111，
+    //转成十进制后就是1061109567,在十六进制下就是0x3f3f3f3f
+
+    d[k]=0;
+    for(int i=0;i&lt;n;i++)//每次循环只会将一个点放入集合中（这里并未真正定义集合而是用st来标识）
+    {
+        int t=-1;
+        for(int j=1;j&lt;=n;j++)//找不在集合中最近的点
+        {
+            if(!st[j]&amp;&amp;(t==-1||d[t]&gt;d[j])) t=j;
+        }
+        
+        st[t]=1;
+        if(t==n) break;//访问到n的时候可以break
+        for(int j=1;j&lt;=n;j++)//更新其他点的距离
+            d[j]=min(d[j],g[t][j]+d[t]);//没有负权边，已经放入集合中的路径一定不会更短，所以不会被更新
+    }
+    if(d[n]==0x3f3f3f3f) return -1;
+    else return d[n];
+}
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    memset(g,0x3f,sizeof g);
+    while(m--)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        g[a][b]=min(g[a][b],c);
+    }
+    cout&lt;&lt;dijkstra(1);
+}
+</code></pre>
+<p>堆优化的Dijkstra</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=150010;
+#define pii pair&lt;int,int&gt;
+int n,m;
+int h[N],e[2*N],ne[2*N],w[2*N],idx;
+int d[N],st[N];
+void add(int a,int b,int c)
+{
+    e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;
+}
+int dijkstra()
+{
+    //用小根堆优化查找最近距离的过程，所以一定要存下距离和点
+    memset(d,0x3f,sizeof d);
+    d[1]=0;
+    priority_queue&lt;pii,vector&lt;pii&gt;,greater&lt;pii&gt;&gt;q;
+    q.push({0,1});
+    while(q.size())
+    {
+        auto t=q.top();
+        q.pop();
+        int v=t.second,dis=t.first;
+        if(st[v]) continue;
+        /*按照d[v]进行排序的，每次访问的一定是距离最短的，所以哪怕堆中有同一个元素的多个距离也无所谓，
+        这个点被访问到时，一定是按照它最短的距离被访问到的*/
+        st[v]=1;
+        if(v==n) break;
+        for(int i=h[v];i!=-1;i=ne[i])
+        {
+            int j=e[i];
+            if(d[j]&gt;dis+w[i])
+            {
+                d[j]=dis+w[i];
+                q.push({d[j],j});
+            }
+        }
+    }
+    if(d[n]!=0x3f3f3f3f) return d[n];
+    else return -1;
+}
+int main()
+{
+    memset(h,-1,sizeof h);
+    cin&gt;&gt;n&gt;&gt;m;
+    while(m--)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        add(a,b,c);
+    }
+    cout&lt;&lt;dijkstra();
+}
+</code></pre>
+<p>Bellman_ford<br>
+该算法的意义在于处理不经过k条边的最短路，算法的核心是每次循环遍历所有边，每次循环只有部分边会被有效更新，而这部分边刚好符合从1到这些边经过不超过k（第一重循环的自变量）条边。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=510,M=10010;
+int n,m,k;
+int d[N],r[N];
+struct edge
+{
+    int a,b,c;
+}e[M];
+void bellman_ford()
+{
+    memset(d,0x3f,sizeof d);
+    d[1]=0;
+    for(int i=0;i&lt;k;i++)
+    /*每次遍历都是在上一次的基础上更新，最开始第一遍，只有与1相连的点x才会被有效更新，
+    第二次遍历那些与x相连的点也会被有效更新，而1到它们刚好经历两条边，
+    所以该算法可以找出经过不超过k条边的最短路*/
+    {
+        memcpy(r,d,sizeof d);
+        for(int j=0;j&lt;m;j++)
+        {
+            int a=e[j].a,b=e[j].b,c=e[j].c;
+            //cout&lt;&lt;a&lt;&lt;b&lt;&lt;c&lt;&lt;endl;
+            d[b]=min(d[b],r[a]+c);
+        }
+    }
+    
+    if(d[n]&gt;0x3f3f3f3f/2) printf(&quot;impossible&quot;);
+    else printf(&quot;%d&quot;,d[n]);
+}
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m&gt;&gt;k;
+    for(int i=0;i&lt;m;i++)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        e[i]={a,b,c};
+    }
+    bellman_ford();
+}
+</code></pre>
+<p>SPFA<br>
+只要图中没有负环就可以用spfa<br>
+spfa的算法是在bellman_ford算法的基础上进行优化得到的，优化的点在于，在bellman_ford算法每次循环访问了所有边，但有些边的访问是没有办法进行有效更新的，那么我们引入bfs的思想，定义一个队列，将有效更新的那些点放入队列当中，每次只考虑队列中的那些点，只有这些点才能带来有效更新。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=100010;
+int n,m;
+int h[N],e[2*N],ne[2*N],w[2*N],idx;
+int d[N],st[N];
+void add(int a,int b,int c)
+{
+    w[idx]=c,e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+void spfa()
+{
+    memset(d,0x3f,sizeof d);
+    d[1]=0;
+    queue&lt;int&gt;q;
+    q.push(1);
+    st[1]=1;
+    while(q.size())
+    {
+        auto t=q.front();
+        q.pop();
+        st[t]=0;
+        for(int i=h[t];i!=-1;i=ne[i])
+        {
+            int j=e[i];
+
+            if(d[j]&gt;d[t]+w[i])//只要成立就要更新
+            {
+                d[j]=d[t]+w[i];
+                if(!st[j])//重复放入没有意义
+                {
+                    q.push(j);
+                    st[j]=1;
+                }
+            }
+        }
+    }
+    if(d[n]&gt;0x3f3f3f3f/2) printf(&quot;impossible&quot;);
+    else printf(&quot;%d&quot;,d[n]);
+}
+int main()
+{
+    memset(h,-1,sizeof h);
+    cin&gt;&gt;n&gt;&gt;m;
+    while(m--)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        add(a,b,c);
+    }
+    spfa();
+}
+</code></pre>
+<p>Floyd<br>
+这个算法用来求多源汇最短路，虽然能求出任意两点之间的最短路，但是时间复杂度也较高。O(n^3)<br>
+基于动态规划，具体原理有待理解。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=210;
+int n,m,k;
+int d[N][N];
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m&gt;&gt;k;
+    //memset(d,0x3f,sizeof d);
+    for(int i=1;i&lt;=n;i++)
+    {
+        for(int j=1;j&lt;=n;j++)
+        {
+            if(i==j) d[i][j]=0;
+            else d[i][j]=0x3f3f3f3f;
+        }
+    }
+    while(m--)
+    {
+        int a,b,c;
+        cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;
+        d[a][b]=min(d[a][b],c);
+    }
+    for(int x=1;x&lt;=n;x++)
+    {
+        for(int y=1;y&lt;=n;y++)
+        {
+            for(int z=1;z&lt;=n;z++)
+            {
+                d[y][z]=min(d[y][z],d[y][x]+d[x][z]);//判断y-&gt;z，经过x会不会使路径变短
+            }
+        }
+    }
+    while(k--)
+    {
+        int a,b;
+        cin&gt;&gt;a&gt;&gt;b;
+        if(d[a][b]&gt;0x3f3f3f3f/2) printf(&quot;impossible\n&quot;);
+        else printf(&quot;%d\n&quot;,d[a][b]);
+    }
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/sou-suo/">
+              <h3 class="post-title">
+                搜索
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

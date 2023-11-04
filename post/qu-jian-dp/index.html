@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>区间dp | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              区间dp
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://www.acwing.com/problem/content/284/">石子合并</a></p>
+<p>这道题与贪心中的合并不同的地方在于此时的合并只能合并相邻的石子堆，但是在贪心问题中可以合并任意堆。</p>
+<p>思路：</p>
+<p>状态表示：本题用二维数组f[i][j]来表示区间[i,j]全部合并完成的方案，f[i][j]的值用来表示花费的最小值。</p>
+<p>状态计算：可发现，对任意区间，最后一次合并都是将两堆合成一堆的过程，那么我们划分时可以从[i,j]区间不同的划分方式入手。</p>
+<p>f[i][j]=min(f[i][k]+f[k+1][j]+s[j]-s[i-1])//这里的s[]表示的是前缀和，因为最后一次合并得到需要耗费整个区间和的体力。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int f[400][400],a[400],s[400];
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+    for(int i=1;i&lt;=n;i++) s[i] = s[i-1]+a[i];
+    for(int len=2;len&lt;=n;len++)
+    {
+        for(int i=1;i+len-1&lt;=n;i++)
+        {
+            int l=i,r=i+len-1;
+            f[l][r]=1e9;//这里因为求的是最小值，所以要将它初始化为尽可能大的值
+            for(int k=l;k&lt;=r-1;k++)
+            {
+                f[l][r]=min(f[l][k]+f[k+1][r]+s[r]-s[l-1],f[l][r]);
+            }
+        }
+    }
+    cout&lt;&lt;f[1][n];
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/xian-xing-dp/">
+              <h3 class="post-title">
+                线性dp
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

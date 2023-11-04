@@ -1,0 +1,180 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Codeforces Round 900 (Div. 3)题解 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Codeforces Round 900 (Div. 3)题解
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-27 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>ABC三题十分简单，不过多赘述，现着重讨论剩下的题，这三题的简单思路和代码附在最后。<br>
+E：<a href="https://codeforces.com/contest/1878/problem/E">Iva &amp; Pav</a><br>
+题目大意：给定一个数组a[],定义f(l,r)=a[l]&amp;a[l+1]&amp;...&amp;a[r]，现给定l,k,需要找到最大的r，使f(l,r)&gt;=k。<br>
+思路：我们考虑&amp;，两个数进行&amp;运算时，我们看它们的二进制数对应的数位的数，如果都为1的时候，结果就是1，否则就是0，所以我们将在[l,r]之间的数进行运算时，只要同一个数位上都是1，就取1，否则取0.因为找最大的r所以应该用二分，但是这里check函数如果写每个数直接取&amp;就会超时，所以要引入预处理优化一下。我们用到的优化就是定义p[i][j]来表示从a中1-i的数，第j位上总共有多少个1,这样我们判断时只用循环30个数，即二进制的每一位，然后判断当前区间中第j位上1的个数是否等于区间的数字个数，如果等于就证明，每个数的第j位都是1，那么答案的第j位一定是1，那么答案就可以加上1&lt;&lt;j;</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[200010],p[200010][40];
+int sl,k;
+int check(int x)
+{
+	int res=0;
+	for(int i=0;i&lt;31;i++)
+	{
+		if(p[x][i]-p[sl-1][i]==x-sl+1)  res += (1&lt;&lt;i);
+	}
+	if(res&gt;=k) return 1;
+	else return 0;
+}
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+		for(int i=1;i&lt;=n;i++)
+		{
+			for(int j=0;j&lt;31;j++)
+			{
+				if(a[i]&amp;(1&lt;&lt;j)) p[i][j] = p[i-1][j]+1;
+				else p[i][j]=p[i-1][j];
+			}
+		}
+		int q;
+		scanf(&quot;%d&quot;,&amp;q);
+		while(q--)
+		{
+ 
+			scanf(&quot;%d%d&quot;,&amp;sl,&amp;k);
+			if(a[sl]&lt;k) printf(&quot;-1 &quot;);
+			else{
+			int l=sl,r=n;
+			while(l&lt;r)
+			{
+				int mid=(l+r+1)/2;
+				if(check(mid)) l=mid;
+				else r=mid-1;
+			}
+			if(check(l)) printf(&quot;%d &quot;,l);
+			else printf(&quot;-1 &quot;);
+			}
+		}
+		printf(&quot;\n&quot;);
+	}
+}
+
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/acdc13/">
+              <h3 class="post-title">
+                ACDC13
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

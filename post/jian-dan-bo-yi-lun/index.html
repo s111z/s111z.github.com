@@ -1,0 +1,235 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>简单博弈论 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              简单博弈论
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h3 id="nim游戏">Nim游戏</h3>
+<p><a href="https://www.acwing.com/problem/content/893/">Nim游戏</a></p>
+<figure data-type="image" tabindex="1"><img src="https://cdn.luogu.com.cn/upload/image_hosting/lawsj9ix.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="" loading="lazy"></figure>
+<p>由上述推导可得出，本题只需要求出每堆石子的异或和即可。</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+    int n;
+    int res=0;
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=0;i&lt;n;i++)
+    {
+        int x;
+        scanf(&quot;%d&quot;,&amp;x);
+        res ^= x;
+    }
+    if(res) printf(&quot;Yes&quot;);
+    else printf(&quot;No&quot;);
+}
+</code></pre>
+<h3 id="台阶nim游戏">台阶Nim游戏</h3>
+<p><a href="https://www.acwing.com/problem/content/894/">台阶-Nim游戏</a></p>
+<p>思路：这道题只能将石子从当前级拿到下一级，而只有第一级是可以直接拿到地上的，所以我们只考虑奇数级台阶，按照前面Nim游戏的思路，求奇数级台阶上石子的异或和。判断是否为0；</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    int res=0;
+    for(int i=0;i&lt;n;i++)
+    {
+        int x;
+        scanf(&quot;%d&quot;,&amp;x);
+        if(i%2==0) res ^= x;
+    }
+    if(res) printf(&quot;Yes&quot;);
+    else printf(&quot;No&quot;);
+}
+</code></pre>
+<h3 id="集合-nim游戏">集合-Nim游戏</h3>
+<p><a href="https://www.acwing.com/problem/content/895/">集合-Nim游戏</a><br>
+<img src="https://cdn.luogu.com.cn/upload/image_hosting/9pqmsw8n.png?x-oss-process=image/resize,m_lfit,h_170,w_225" alt="" loading="lazy"></p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[120],f[10010];
+int n,m;
+int sg(int x)
+{
+    if(f[x]!=-1) return f[x];
+    set&lt;int&gt;s;
+    for(int i=0;i&lt;n;i++)
+    {
+        if(x&gt;=a[i]) s.insert(sg(x-a[i]));
+    }
+    for(int i=0;;i++) 
+    {
+        if(!s.count(i))  return f[x]=i;//s.count(i)在s中查找有没有i这个数
+    }
+}
+int main()
+{
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=0;i&lt;n;i++) scanf(&quot;%d&quot;,&amp;a[i]);
+    scanf(&quot;%d&quot;,&amp;m);
+    int res=0;
+    memset(f,-1,sizeof f);
+    for(int i=0;i&lt;m;i++)
+    {
+        int x;
+        scanf(&quot;%d&quot;,&amp;x);
+        res ^= sg(x);
+    }
+    if(res) cout&lt;&lt;&quot;Yes&quot;;
+    else cout&lt;&lt;&quot;No&quot;;
+}
+</code></pre>
+<p>拆分Nim游戏</p>
+<p>将任意一对石子拆分放进两堆更小的，这两堆只要每堆都小于当前堆即可，剩下条件没有限制。</p>
+<p>思路：我们将其拆分sg(x1,x2)=sg(x1)^sg(x2),那就是每次拆完后将拆出的两组异或起来，然后再求sg（）；</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,f[200];
+int sg(int x)
+{
+    if(f[x]!=-1) return f[x];
+    set&lt;int&gt;s;
+    for(int i=0;i&lt;x;i++)
+    {
+        for(int j=0;j&lt;=i;j++)
+        s.insert(sg(i)^sg(j));
+    }
+    for(int i=0;;i++)
+    {
+        if(!s.count(i)) return f[x]=i;
+    }
+}
+int main()
+{
+    scanf(&quot;%d&quot;,&amp;n);
+    int res=0;
+    memset(f,-1,sizeof f);
+    for(int i=0;i&lt;n;i++)
+    {
+        int x;
+        scanf(&quot;%d&quot;,&amp;x);
+        res ^= sg(x);
+    }
+    if(res) printf(&quot;Yes&quot;);
+    else printf(&quot;No&quot;);
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/gao-si-xiao-yuan/">
+              <h3 class="post-title">
+                高斯消元
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

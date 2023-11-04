@@ -1,0 +1,545 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>搜索 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              搜索
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>dfs<br>
+bfs<br>
+树和图的dfs和bfs<br>
+其实单纯遍历图的话，两种搜索方式都可以，比如油田问题，两种算法都能写通，因为它们都是遍历整张图，只是对同一节点的遍历顺序可能不一样而已。</p>
+<p>dfs和bfs的区别：dfs是沿着一条路尽可能的往深处搜，搜到末端的时候回溯搜另一条路；而bfs则是将每一层都搜完然后去搜下一层。它们都可以遍历图和树<br>
+<img src="https://s111z.github.io/post-images/1695103363051.png" alt="" loading="lazy"></p>
+<h2 id="dfs">dfs</h2>
+<p>回溯：当搜索到当前路径的末端时，就要返回上一层，这一过程就被称为回溯。回溯最重要的就是将状态恢复。回溯一定要在一次递归后面。<br>
+我们以排列数字题作为例子：<br>
+<a href="https://www.acwing.com/problem/content/844/">排列数字</a><br>
+思路：就是将每一位上放一个数，记录状态，然后考虑下一位数填什么。这里就两个数组，一个数组来记录某个数是否被用过，另一个数组来记录每一位上放了什么。一定要记得回溯要恢复状态。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n;
+vector&lt;int&gt;a;
+int st[10];
+void dfs(int k)
+{
+    if(k==n+1) 
+    {
+        for(int i=0;i&lt;a.size();i++)
+        {
+            printf(&quot;%d &quot;,a[i]);
+        }
+        printf(&quot;\n&quot;);
+    }
+    for(int i=1;i&lt;=n;i++)
+    {
+        if(!st[i])
+        {
+            st[i]=1;
+            a.push_back(i);
+            dfs(k+1);
+            a.pop_back();
+            st[i]=0;
+        }
+    }
+}
+int main()
+{
+    cin&gt;&gt;n;
+    dfs(1);
+}
+</code></pre>
+<p>剪枝：所谓剪枝就是在这条路径还没有访问结束的时候，就判断出这条路径一定不合法，进而直接舍掉这条路，进行回溯。<br>
+我们以n皇后问题为例：<br>
+<a href="https://www.acwing.com/problem/content/845/">n皇后问题</a><br>
+思路：根据题目可知，每行每列只能放一个棋子，所以我们来讨论每一行的棋子放在哪一列，那么就转化成了排列数字问题，不过这道题还有一个限制条件，就是斜着也不能共线，我们观察可发现，斜着的线根据横纵坐标的关系可分成两类，其中一类，每条斜线上的点的横纵坐标相加结果一定，另一类，每条斜线上的点n-x+y的值相同。所以我们再定义两个数组来标记当前的斜线是否被访问过即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n;
+vector&lt;int&gt;a;
+bool c[10],dg[30],udg[30];
+void dfs(int k)//k表示访问第k行
+{
+    if(k==n)
+    {
+        for(int i=0;i&lt;n;i++)
+        {
+            for(int j=0;j&lt;n;j++)
+            {
+                if(a[i]==j) printf(&quot;Q&quot;);
+                else printf(&quot;.&quot;);
+            }
+            printf(&quot;\n&quot;);
+        }
+        printf(&quot;\n&quot;);
+        return;
+    }
+    for(int i=0;i&lt;n;i++)
+    {
+        if(!c[i]&amp;&amp;!dg[i+k]&amp;&amp;!udg[n-k+i])
+        {
+            c[i]=dg[i+k]=udg[n-k+i]=1;
+            a.push_back(i);
+            dfs(k+1);
+            a.pop_back();
+            c[i]=dg[i+k]=udg[n-k+i]=0;
+        }
+    }
+    
+}
+int main()
+{
+   
+    scanf(&quot;%d&quot;,&amp;n);
+    dfs(0);
+}
+</code></pre>
+<p>n皇后还有一种写法，同时也是dfs的另一种写法，按照这个点放与不放分成两类。这种写法一定要注意条件的判断，否则很容易超时，因为每个点都有两种情况，所以很容易时间复杂度就是2的多少次方了。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n;
+bool row[10],col[10],dg[20],udg[20];//row是行，col是列
+char g[10][10];
+void dfs(int x,int y,int k)
+{
+    if(y==n) x++,y=0;
+    
+    if(x==n)
+    {
+        if(k==n)
+        {
+            for(int i=0;i&lt;n;i++)
+            {
+                for(int j=0;j&lt;n;j++) printf(&quot;%c&quot;,g[i][j]);
+                puts(&quot;&quot;);
+            }
+            puts(&quot;&quot;);
+        }
+        return;
+    }
+    
+    dfs(x,y+1,k);
+    
+    if(!row[x]&amp;&amp;!col[y]&amp;&amp;!dg[x+y]&amp;&amp;!udg[n-x+y])
+    //这里放要进行判断，这一分支不会始终存在，在一定程度上降低了时间复杂度。
+    {
+        g[x][y]='Q';
+        row[x]=col[y]=dg[x+y]=udg[n-x+y]=true;
+        dfs(x,y+1,k+1);
+        row[x]=col[y]=dg[x+y]=udg[n-x+y]=false;
+        g[x][y]='.';
+        
+    }
+}
+int main()
+{
+    cin&gt;&gt;n;
+    memset(g,'.',sizeof g);//可以这么用
+    dfs(0,0,0);
+}
+</code></pre>
+<h2 id="bfs">BFS</h2>
+<p>bfs就是从一个点开始，一层一层往外搜，将搜到的点放入队列，每个点只被第一个搜到它的点更新，队列中也按照距离从小到大的距离排的，因为距离远的后被搜到，后放入队列。<br>
+bfs要注意，如果边权都为正，那么一定是近的点先被放入；一旦有负权，queue中的也可以被更新，st的意义只是防止重复放入queue，减少不必要的访问，而且有负权的情况下，队列中的远近不严格，我们用队列的意义就是将值被更新的存一下，因为它被更新了，就会影响其他点的距离。所以访问顺序严格来说也无所谓，实际上，因为图为有向图，所以就是一直更新到不能更新即可（无负环的情况，有负环就要考虑判断退出的问题）<br>
+要想查找某个点的路径，可以记录某个点是由谁更新而来，然后倒推路径。<br>
+元素是一层一层被放入的，队列中的元素的层级最多相差1，所以不会存在队列中的元素还能被当前访问到的元素更新，能被更新的都是没被放入的。<br>
+其实，bfs的意义就是一层一层的去遍历图，只能表示层级关系，如果边权都是1（或者都相等），那么层级与路径长重合，可将层级视为最短路，但bfs是不能来求最短路的，因为队列中的元素，只有层级有非降序关系，一旦引入边权后，队列中的元素就没有距离的远近关系（可以被别的点更新），但我们每次需要取的是距离最近的点，那么bfs或是说queue就不能用于求边权不为1的最短路。<br>
+<a href=""></a></p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m;
+int g[120][120],d[120][120];
+int dx[]={0,0,1,-1};
+int dy[]={1,-1,0,0};
+bool st[120][120];
+pair&lt;int,int&gt; p[120][120];//pair&lt;int,int&gt;也是一种数据类型，自然可以开数组
+void bfs(int x,int y)
+{
+    queue&lt;pair&lt;int,int&gt;&gt;q;
+    d[x][y]=0;
+    st[x][y]=1;
+    q.push({x,y});
+    while(q.size())
+    {
+        auto t=q.front();
+        q.pop();
+        for(int i=0;i&lt;4;i++)
+        {
+            x=t.first+dx[i];
+            y=t.second+dy[i];
+            if(0&lt;=x&amp;&amp;x&lt;n&amp;&amp;0&lt;=y&amp;&amp;y&lt;m&amp;&amp;!g[x][y]&amp;&amp;!st[x][y])//x,y的坐标得加限定
+            {
+                d[x][y]=d[t.first][t.second]+1;
+                q.push({x,y});
+                st[x][y]=1;
+                p[x][y]=t;//想要得到最短路径，只需要记录当前状态是由谁更新而来的即可。
+            }
+        }
+    }
+    printf(&quot;%d\n&quot;,d[n-1][m-1]);
+    int i=n-1,j=m-1;
+    while(i||j)//倒着将路径输出，因为我们记录的是当前点是从哪个点走来的，所以只能倒着推路径
+    {
+        auto t=p[i][j];
+        printf(&quot;%d %d\n&quot;,t.first,t.second);
+        i=t.first,j=t.second;
+    }
+}
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    for(int i=0;i&lt;n;i++)
+    {
+        for(int j=0;j&lt;m;j++)
+        {
+            cin&gt;&gt;g[i][j];
+        }
+    }
+    bfs(0,0);
+}
+</code></pre>
+<h2 id="树和图">树和图</h2>
+<p>树是无环连通图<br>
+图分有向图和无向图<br>
+有向图的存储：1.邻接矩阵，2.邻接表<br>
+邻接矩阵：g[i][j]，有两种存法，如果无边权，那么就用1表示有边，0表示无边，若有边权，那就用这个来存边权。（多用于稠密图，即边多的图）<br>
+邻接表：对每个点建立一个单链表。h[]和ne[]都用来存下标，e[]用来存值，其实可用vector，但是数组模拟会更快，但原理差不多。idx这个变量可以视为它存的是边（多用于稀疏图）</p>
+<p>遍历：<br>
+dfs:从一个点开始，走到走不了了回溯，走另一条路，直到将联通的点全部遍历结束。<br>
+bfs:从一个点开始，一层往外搜，搜到走不动为止。<br>
+无论是深搜还是宽搜，每个点只会被遍历一次。</p>
+<p>dfs遍历树：<br>
+<a href=""></a><br>
+dfs遍历树：首先用邻接表将树存起来，然后开始遍历，对于每个点遍历它可以到的点即可，但是要注意，一般每个点都只遍历一次，多了会超时，所以我们在思考时就要想如何在每个点只遍历一次的情况下完成遍历树需要完成的任务。<br>
+这道题按照这个来思考：首先用邻接表来存树，该题是无向图，但由于我们每个点都只遍历一次，有第一个开始遍历的点，所以说我们人为的给了这棵树一个顺序，那么为了使我们给的顺序可以走通，我们就必须将两点之间的一来一回都存上。为了使遍历一次就完成任务，首先我们在这次遍历中需要统计出这个点每个子节点（人为定的顺序）的支路点数（这时就将dfs视为一个可以计数的函数来用），然后还要知道走到它的那条路径上的点数，这里就用n-(子节点支路点数和+1)，因为图中无环（树是连通图，n个点,n-1条边一定无环），且每个点遍历一次，那么在遍历过程中有一个点走到它，那么对它来说，所有可以走到的点，有且仅有一个点是已经被访问过的，这条路就可视作父路，进而就可以算出父路的点数。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n;
+const int N=1e5;
+int h[N],ne[2*N],e[2*N],idx;
+bool st[N];//每个点只被访问一次
+void add(int a,int b)//只有e数组是用来存值的，剩下都用来存下标，ne[]是下标指下标
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+int ans=N;
+int dfs(int u)
+{
+    st[u]=1;
+    int sum=1,res=0;
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(!st[j])
+        //每个点只被访问一次，所以只会向下访问
+        //图中无环（连通图,n-1条边不可能产生环），所以与该点相连的点中，有且仅有走到这个点的点是被访问过的，因为我们一直向下访问
+        //对于每条支路的点数，我们用s来表示，而从父节点方向出去的就用n-sum(sum的初值为1就是算上了当前点)
+        /*同时因为对于每个点我们都考虑它的子节点的支路和从父节点出去后的路径，
+        所以我们实际上可以在每个点都访问一次的情况下完成计数*/
+        {
+            int s=dfs(j);
+            res = max(res,s);
+            sum += s;
+        }
+    }
+    res = max(res,n-sum);
+    ans = min(res,ans);
+    return sum;
+}
+int main()
+{
+    cin&gt;&gt;n;
+    memset(h,-1,sizeof h);
+    int t=n-1;
+    while(t--)
+    {
+        int a,b;
+        cin&gt;&gt;a&gt;&gt;b;
+        add(a,b),add(b,a);
+        /*虽然我们仅从一个点出发，而且只向下访问，但是我们除了第一个点被默认为父节点以外，
+        剩下的点的父子关系未必和题中给的顺序一样，图实际上是无向图，但是我们默认第一个点为父节点，
+        人为生成了一张有向图，为保证这张有向图上的边合理，所以我们要定义双向的边。*/
+    }
+    dfs(1);
+    cout&lt;&lt;ans;
+}
+</code></pre>
+<p>bfs遍历树其实也简单，就是将遍历过的点放入队列，一层一层的找就是。<br>
+<a href=""></a></p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m;
+const int N=100010;
+int h[N],ne[2*N],e[2*N],idx,d[N];
+bool st[N];
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;   
+}
+int bfs()
+{
+    memset(d,-1,sizeof d);
+    d[1]=0;
+    queue&lt;int&gt;q;
+    q.push(1);
+    st[1]=1;
+    while(q.size())
+    {
+        auto t=q.front();
+        q.pop();
+        for(int i=h[t];i!=-1;i=ne[i])
+        {
+            int j=e[i];
+            if(!st[j])
+            {
+                d[j]=d[t]+1;
+                st[j]=1;
+                q.push(j);
+            }
+        }
+    }
+    return d[n];
+}
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    memset(h,-1,sizeof h);
+    while(m--)
+    {
+        int a,b;
+        cin&gt;&gt;a&gt;&gt;b;
+        add(a,b);//邻接表不用考虑重边，邻接表会将重边都存入，但是由于每个点只会被访问一次，所以重边也就无所谓了
+    }
+    cout&lt;&lt;bfs()&lt;&lt;endl;
+}
+</code></pre>
+<p>拓扑排序:所谓拓扑排序就是在无环的有向图中，如果一个点a可以走到另一个点b,那么a一定要在b的前面，我们的思路就是考虑点的入度，将入度为0的点放入队列，然后遍历它连的点，对于它连的点，因为该点已经被放入，所以我们要将这些点的入度都减1，因为当前点已经被排序，它对后面点的影响可以忽略掉。<br>
+<a href=""></a></p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=100010;
+int n,m;
+int h[N],ne[2*N],e[2*N],idx;
+int r[N],st[N];
+queue&lt;int&gt;s;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+int bfs()
+{
+    queue&lt;int&gt;q;
+   for(int i=1;i&lt;=n;i++)
+    if(!r[i])
+    {
+        q.push(i),s.push(i);
+        
+    }
+    while(q.size())
+    {
+        auto t=q.front();
+        q.pop();
+        for(int i=h[t];i!=-1;i=ne[i])
+        {
+            int j=e[i];
+            r[j]--;
+            if(r[j]==0)
+            {
+                q.push(j);
+                s.push(j);
+            }
+        }
+    }
+    if(s.size()!=n) return 0;
+    else return 1;
+}
+int main()
+{
+    cin&gt;&gt;n&gt;&gt;m;
+    memset(h,-1,sizeof h);
+    while(m--)
+    {
+        int a,b;
+        cin&gt;&gt;a&gt;&gt;b;
+        add(a,b);
+        r[b]++;
+    }
+    if(bfs())
+    {
+        
+        while(s.size())
+        {
+            auto t=s.front();
+            s.pop();
+            cout&lt;&lt;t&lt;&lt;&quot; &quot;;
+        }
+    }
+    else printf(&quot;-1&quot;);
+}
+</code></pre>
+<p>bfs进阶——八数码问题（数字华容道）<br>
+<a href=""></a><br>
+这道题bfs的过程实际上很简单，难点在于状态表示，我们是用一个string来表示状态，对于每一个状态，我们将找出所有它可以更新得到的状态，直到得到我们想要的状态，或者判断我们无法得到最终的状态。难点在于二维的更新，我们将其转化成一维来做。</p>
+<pre><code class="language-cpp">/*本题就是将一种局面看作是一种状态，同时枚举出能由此状态更新到的状态，用bfs的思路找出最后是否可以得到最终状态*/
+#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int dx[]={0,0,1,-1};
+int dy[]={1,-1,0,0};
+int bfs(string s)
+{
+    queue&lt;string&gt;q;
+    unordered_map&lt;string,int&gt;d;//无序map，用哈希表实现，更快
+    q.push(s);
+    d[s]=0;
+    string end=&quot;12345678x&quot;;
+    while(q.size())
+    {
+        auto t=q.front();
+        q.pop();
+        if(t==end) return d[t];
+        int dis=d[t];
+        auto idx=t.find('x');
+        int a=idx/3,b=idx%3;//将一维转化成二维中的坐标
+        for(int i=0;i&lt;4;i++)
+        {
+            int x=a+dx[i],y=b+dy[i];//上下左右移动
+            if(0&lt;=x&amp;&amp;x&lt;3&amp;&amp;0&lt;=y&amp;&amp;y&lt;3)
+            {
+                swap(t[idx],t[x*3+y]);
+                if(!d.count(t))
+                {
+                    q.push(t);
+                    d[t]=dis+1;
+                }
+                swap(t[idx],t[x*3+y]);//得换回去，方便下一次移动
+            }
+        }
+    }
+    return -1;
+}
+int main()
+{
+    string s;
+    for(int i=0;i&lt;9;i++)
+    {
+        char c;
+        cin&gt;&gt;c;//cin不会录空格
+        s += c;//string可以直接加字符，但不能直接减字符
+    }
+    cout&lt;&lt;bfs(s);
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/rong-chi-yuan-li/">
+              <h3 class="post-title">
+                容斥原理
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

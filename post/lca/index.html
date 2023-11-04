@@ -1,0 +1,655 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LCA | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              LCA
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-28 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p>LCA即最近公共祖先。<br>
+给定一棵树及它的根节点，每次询问给出x,y两个点，我们要求x和y的最近公共祖先（公共祖先：F既是x的祖先也是y的祖先，那么F就是公共祖先，我们要求距离两者最近的那个公共祖先，即为LCA(x,y)）<br>
+LCA的性质：<br>
+1.在所有的公共祖先中距离x和y都是最近的，<br>
+2.x,y之间的最短路径经过LCA(x,y)（这个后面点分树会用上）<br>
+3.x,y本身也可以是自己的公共祖先(当一个点是另一个点的子节点是成立)</p>
+<p>暴力（虽然会超时，但却是后面两种思维的起点）<br>
+思路：我们先根据根节点定出x,y的层级，如果x的层级比y深（y的层级比x深同理），我们让x一层一层往上，当与y同级时，如果x没和y重合，那么就是x和y一起往上找，直到x和y重合为止。<br>
+有多个询问，如果对每个询问都这么处理，显而易见，会超时。那么就需要进行优化。</p>
+<p>倍增法：<br>
+这里是对找层级进行优化，在暴力算法中，层级是一层一层往上找的，我们可以引入二进制优化，即每次上跳2<sup>i,很容易证明任何一个正整数都可以被拆成若干个2</sup>i（i为非负整数）相加，那么我们就可以这么跳。只需要在建立层级的时候，将每个点上跳2^i到哪个点记录一下即可。这里涉及到一个递推：<br>
+f[x][i]表示x上跳2^i到的点，递推关系为：<br>
+f[x][i]=f[f[x][i-1]][i-1]<br>
+解释：x上跳2<sup>i次方等价于x上跳到2</sup>(i-1)位置再上跳2<sup>(i-1),2</sup>(i-1)+2<sup>(i-1)=2</sup>i;<br>
+递推公式的意义就是方便我们的计算，因为边缘状态比较好确定，剩下的直接递推就可以得到。<br>
+除了对上跳进行优化以外，别的地方都不变，也是x先上跳到与y相同层级，然后再一起上跳。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+cont int N=500005;
+int h[N],e[2*N],ne[2*N],idx;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+int d[N];
+void dfs(int u,int fa)
+{
+    d[u]=d[fa]+1;
+    f[u][0]=fa;//上跳2^0=1,即跳到父节点
+    for(int i=1;u-(1&lt;&lt;i)&lt;=d[u];i++) f[u][i]=f[f[u][i-1]][i-1];
+    //这里的判断条件要注意一下，不能跳出去了
+    //f[x][i]只是用来记录x上跳2^i后会落在哪里，实际跳的距离还是2^i
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(j!=fa)
+        {
+            dfs(j,u);
+        }        
+    }
+}
+int LCA(int x,int y)
+{
+    if(d[x]&lt;d[y]) swap(x,y);
+    for(int i=20;i&gt;=0;i--)
+    {
+        if(d[x] - (1&lt;&lt;i)&gt;=d[y]) x=f[x][i];
+    }
+    if(x==y) return x;
+    for(int i=20;i&gt;=0;i--)
+    {
+        if(f[x][i]!=f[y][i])   //比公共祖先深度浅的祖先对两者来说都是相同的，所以这里从最大的开始看，如果不相等，就证明还没有到最近公共祖先，自然可以上跳
+            x=f[x][i],y=f[y][i];
+    }
+    return f[x][0];
+}
+int main()
+{
+    int n,m,root;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m,&amp;root);
+    for(int i=1;i&lt;n;i++)
+    {
+        int a,b;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        add(a,b),add(b,a);
+    }    
+    dfs(root,root);
+    while(m--)
+    {
+        int a,b;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        printf(&quot;%d&quot;,LCA(a,b));
+    }
+}
+</code></pre>
+<p>Tarjin<br>
+上面一种算法是对每个询问单独处理，如果我们可以像点分治中一样统一处理所有的询问，自然会更快。<br>
+倍增法是通过上跳来找，那我们换个思路，在建树的过程中就向下找，访问到y的时候，如果x已经被访问过，那么就有两种情况，如下图：<br>
+<img src="https://s111z.github.io/post-images/1698584609828.jpg" alt="" loading="lazy"><br>
+上图中第一种情况，x是y的祖先，我们dfs()传入两个参数，当前节点u和父节点fa，那么我们在访问y的时候，发现已经访问过x了，就只用去找y的祖先，就会找到x，具体实现我们后面结合代码来说<br>
+第二种情况，也是去找y的祖先，可以找到u，具体实现结合代码来说。</p>
+<pre><code class="language-cpp">void dfs(int u,int fa)
+{
+    f[u]=u;
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(j!=fa)
+        {
+            dfs(j,u);
+            f[j]=u;
+        }
+    }
+    //因为是一层一层往里面搜的，当前层搜的u的父节点就是本身，对于第一种情况往上找一定会找到x；
+    //对于第二种情况，访问x层时，实际上还没有结束u层，那么f[u]=u，所以y往上找一定会找到u；
+    for(int i=hq[u];i!=-1;i=neq[i])
+    {
+        int j=eq[i];
+        if(vis[j]) ans[w[i]]=find(j);
+    }
+}
+</code></pre>
+<p>另外在询问中，对于一个x，可能有多个y，而且还要记录它们是第几个询问，所以我们不妨也用邻接表来存。<br>
+完整代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=500010;//开大一点
+int h[N],e[2*N],ne[2*N],idx;
+int hq[N],eq[2*N],neq[2*N],w[2*N],idxq;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+void addq(int a,int b,int c)
+{
+    eq[idxq]=b,w[idxq]=c,neq[idxq]=hq[a],hq[a]=idxq++;    
+}
+int ans[N],f[N],vis[N];
+int find(int x)
+{
+    return x==f[x]?x:f[x]=find(f[x]);
+}
+void Tarjin(int u)
+{
+    vis[u]=1;
+    f[u]=u;
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(!vis[j])
+        {
+            Tarjin(j);
+            f[j]=u;//这里是给j赋父节点
+        }
+    }
+    for(int i=hq[u];i!=-1;i=neq[i])
+    {
+        int j=eq[i];
+        if(vis[j])
+        {
+            ans[w[i]]=find(j);
+        }
+    }
+}
+int main()
+{
+    memset(h,-1,sizeof h);
+    memset(hq,-1,sizeof hq);
+    int n,m,s;
+    scanf(&quot;%d%d%d&quot;,&amp;n,&amp;m,&amp;s);
+    for(int i=1;i&lt;n;i++)
+    {
+        int x,y;
+        scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+        add(x,y),add(y,x);//只说有边，没说是有向边
+    }
+    for(int i=1;i&lt;=m;i++)
+    {
+        int x, y;
+        scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+        addq(x,y,i),addq(y,x,i);
+	}
+    Tarjin(s);
+    for(int i=1;i&lt;=m;i++)
+    {
+        printf(&quot;%d\n&quot;,ans[i]);
+    }
+}
+</code></pre>
+<p>LCA应用<br>
+LCA的应用在于用来处理图或树中指定端点的路径，LCA的存在相当于给了这条路径一个顺序，将这一条路拆成两半供我们操作。<br>
+下面的例1，就利用LCA对路径实现顺序操作的实现，因为差分数组一定是顺序访问才有效；<br>
+而例2，则是给出了利用上跳的原理遍历整条路，同时类比fa[][]数组来统计路径上的最小值。<br>
+LCA也可以理解成人为的给无向图赋上了方向，一条边如果有一个指定的顺序来进行操作，就会简化很多。</p>
+<p>LCA+差分<br>
+eg1:<a href="https://www.luogu.com.cn/problem/P3128">Max Flow P</a><br>
+题目大意：有n个节点，用n-1条边连接，所有的节点都连通了。给出m条路劲，第i条路径为从节点si到ti。每给出一条路径，路径上所有节点的权值都加1，输出最大权值点的权值。<br>
+思路：“每给出一条路径，路径上所有节点的权值都加1”这句话很重要，很明显，暴力的思路是遍历这条路，然后将这条路上的点权都加1，但显而易见，会超时，但是这种很明显是对一段区间进行统一操作，很容易想到差分。我们接着往下想，差分是在一维区间中，在从前往后遍历的过程中将数累计出来，我们要想差分就一定要实现一个点先被访问，一个点后被访问，那么如何来实现呢？很明显对于题目中的无向图，没办法指定一条路径使m条路径中都是一个点先被访问，一个点后被访问。这里我们引入LCA，对于任意两个点，它们都有一个LCA点，这个点一定在这条路径上，所以我们可以以LCA为界，将路劲分为两半，我们可以先建立有向图，然后往下访问的过程中一定是先访问到LCA，那么如果我们在回溯的过程中开始累计，不就可以实现差分数组累计的过程嘛，另外要注意，LCA会被回溯两次，所以我们在LCA处要--，不能全减在fa[LCA][0]上。那么由此我们就实现了累计，剩下的，我们只要在遍历的过程中统计一下即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=50010;
+int h[N],e[2*N],ne[2*N],idx;
+int deep[N],vis[N],f[N][30],d[N];
+void add(int a,int b)
+{
+	e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+void dfs(int u,int fa)
+{
+	deep[u]=deep[fa]+1;
+	f[u][0]=fa;
+	for(int i=1;(1&lt;&lt;i)&lt;=deep[u];i++)
+	{
+		f[u][i]=f[f[u][i-1]][i-1];
+	}
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j!=fa) dfs(j,u);
+	}
+}
+int LCA(int x,int y)
+{
+	if(deep[x]&lt;deep[y]) swap(x,y);
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(deep[x]-(1&lt;&lt;i)&gt;=deep[y]) x=f[x][i];
+	}
+	if(x==y) return x;
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(f[x][i]!=f[y][i])
+		{
+			x=f[x][i];
+			y=f[y][i];
+		}
+	}
+	return f[x][0];
+}
+int ans=0;
+void getans(int u)
+{
+	vis[u]=true;
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(!vis[j])
+		{
+			getans(j);
+			d[u] += d[j];
+		}
+	}
+	ans = max(ans,d[u]);
+}
+int main()
+{
+	memset(h,-1,sizeof h);
+	int n,k;
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+	for(int i=0;i&lt;n-1;i++)
+	{
+		int x,y;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+		add(x,y),add(y,x);
+	}	
+	dfs(1,1);
+	//printf(&quot;ok&quot;);
+	for(int i=0;i&lt;k;i++)
+	{
+		int x,y;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+		int lca=LCA(x,y);
+		d[x]++,d[y]++,d[lca]--,d[f[lca][0]]--;
+	}
+	getans(1);
+	printf(&quot;%d&quot;,ans);
+}
+</code></pre>
+<p>LCA+最大生成树<br>
+<a href="https://www.luogu.com.cn/problem/P1967">货车运输</a><br>
+题目大意：A 国有n 座城市，编号从1到n，城市之间有m条双向道路。每一条道路对车辆都有重量限制，简称限重。<br>
+现在有 q 辆货车在运输货物， 司机们想知道每辆车在不超过车辆限重的情况下，最多能运多重的货物。<br>
+我们对于每辆货车，知道它的起点和终点。<br>
+思路：这里给的是图，所以两点之间的路径不只有一条，我们肯定是要最大的（沿途每段都最大），该如何确定呢？我们可以根据最小生成树来推出最大生成树，即将边按照权重从大到小排序，遍历每条边，判断每条边连接的两点的祖先是否连在一起，如果连在一起就说明两点之间已经有更大的路径可以将它们连通了，这条边肯定不会走，如果不连在一起就说明这边边必须走，那么把它加入最大生成树中即可。我们得到最大生成树，然后要想实现题目要求，两点之间走的路径一定是最大生成树中的边。这里实际上对于两点可以使用暴力来求，即从一点开始dfs，但是显而易见会超时，那么就要进行优化。我们引入LCA进行优化，LCA的实现过程就是两个点找最近公共祖先，这个最近公共祖先一定在路径上，那么我们在进行LCA查找的过程中就相当于遍历了这条路径，而且是以一种很高效的方式遍历了这条路径，在这个过程中，路径上边权的最小值自然可以得到。由于LCA查找的过程是不断上跳，那么我们就要用一个数组来记录，被跳过的这一段中的最小边权。<br>
+我们现在来讨论这个数组：<br>
+j上跳2<sup>i，可以分成两段，分别是j~j-2</sup>(i-1) ,j-2<sup>(i-1)~j-2</sup>i，那么这一段的最小值即w[j][i]就是由这两段取最小得到的，这种递推，我们只要将初值(边界值，i=0)赋一下,剩下的就可以启动递推来计算。然后上跳过程中就可以直接用这个来统计。<br>
+至此我们就讨论完毕。该题的主要步骤就是：1.产生最大生成树；2.LCA预处理（分两部分：一部分dfs（）建立有向的树，另一部分预处理fa[][]和w[][]）；3.LCA找答案。</p>
+<pre><code class="language-cpp">wq[j][i]=min(wq[j][i-1],wq[fa[j][i-1]][i-1]);
+//从小到大进行递推，只要递推开始赋值了就可，我们在预处理每棵树的时候赋了值
+</code></pre>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=100010;
+int n,m;
+int vis[N];
+//kruscal算法最好用结构体来存边
+struct edge{
+	int u,v,w;
+}e1[2*N],e2[2*N];
+int h[N],e[N],ne[N],w[N];
+int idx1,idx2;
+bool cmp(edge x,edge y)
+{
+	return x.w&gt;y.w;
+}
+void add1(int a,int b,int c)
+{
+	e1[idx1++]={a,b,c};
+}//存原图
+void add2(int a,int b,int c)
+{
+	w[idx2]=c,e[idx2]=b,ne[idx2]=h[a],h[a]=idx2++;
+}//存最大生成树
+int f[N];
+int find(int x)
+{
+	return x==f[x]?x:f[x]=find(f[x]);
+}
+void kruscal()
+{
+	sort(e1,e1+idx1,cmp);
+	for(int i=1;i&lt;=n;i++) f[i]=i;//
+	for(int i=0;i&lt;idx1;i++)
+	{
+		int u=e1[i].u,v=e1[i].v;
+		if(find(u)!=find(v))
+		{
+			f[find(u)]=find(v);//
+			add2(u,v,e1[i].w);
+			add2(v,u,e1[i].w);//
+		}
+	}	
+}
+int fa[N][30],wq[N][30];
+int d[N];
+void dfs(int u)
+{
+	vis[u]=1;
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(!vis[j])
+		{
+			fa[j][0]=u;
+			wq[j][0]=w[i];
+			d[j]=d[u]+1;
+			dfs(j);//
+		}
+	}
+}
+int LCA(int x,int y)
+{
+	if(find(x)!=find(y)) return -1;//不连通，给的是图
+	int ans=1e9;
+	if(d[x]&lt;d[y]) swap(x,y);
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(d[x]-(1&lt;&lt;i)&gt;=d[y]) 
+		{
+			x=fa[x][i];
+			ans=min(ans,wq[x][i]);//在上跳过程中更新最小距离
+		}
+	}
+	if(x==y) return ans;
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(fa[x][i]!=fa[y][i])
+		{
+			x=fa[x][i],y=fa[y][i];
+			ans=min(ans,wq[x][i]);
+			ans=min(ans,wq[y][i]);
+		}
+	}
+	ans=min(ans,wq[x][0]);
+	ans=min(ans,wq[y][0]);
+	return ans;//找最近公共祖先节点的过程中就遍历了这条路径
+}
+int main()
+{
+	memset(h,-1,sizeof h);
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+	for(int i=0;i&lt;m;i++)//
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		add1(a,b,c);
+	}
+	kruscal();
+
+	for(int i=1;i&lt;=n;i++)
+	{
+		if(!vis[i]) 
+		{
+			d[i]=1;//这个点没被访问过，那么这个点一定是一棵树的起点（根节点），父节点是本身，上跳为正无穷
+			dfs(i);
+			fa[i][0]=i;//
+			wq[i][0]=1e9;//
+		}
+	}
+	for(int i=1;i&lt;=20;i++)
+	{
+		for(int j=1;j&lt;=n;j++)
+		{
+			fa[j][i]=fa[fa[j][i-1]][i-1];
+			wq[j][i]=min(wq[j][i-1],wq[fa[j][i-1]][i-1]);//从小到大进行递推，只要递推开始赋值了就可，我们在预处理每棵树的时候赋了值
+		}
+	}
+	//printf(&quot;wq&quot;);
+	int q;
+	scanf(&quot;%d&quot;,&amp;q);
+	for(int i=0;i&lt;q;i++)
+	{
+		int x,y;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+		int t=LCA(x,y);
+		printf(&quot;%d\n&quot;,t);
+	}
+}
+</code></pre>
+<p>LCA+二分<br>
+<a href="https://www.luogu.com.cn/problem/P2680">运输计划</a><br>
+题目大意：L 国有 n 个星球，还有 n−1 条双向航道，每条航道建立在两个星球之间，这 n−1 条航道连通了 L 国的所有星球。<br>
+小 P 掌管一家物流公司， 该公司有很多个运输计划，每个运输计划形如：有一艘物流飞船需要从 ui号星球沿最快的宇航路径飞行到vi号星球去。显然，飞船驶过一条航道是需要时间的，对于航道 j，任意飞船驶过它所花费的时间为 tj，并且任意两艘飞船之间不会产生任何干扰。<br>
+为了鼓励科技创新， L 国国王同意小 P 的物流公司参与 L 国的航道建设，即允许小 P 把某一条航道改造成虫洞，飞船驶过虫洞不消耗时间。<br>
+在虫洞的建设完成前小 P 的物流公司就预接了 m 个运输计划。在虫洞建设完成后，这 m 个运输计划会同时开始，所有飞船一起出发。当这 m 个运输计划都完成时，小 P 的物流公司的阶段性工作就完成了。<br>
+如果小 P 可以自由选择将哪一条航道改造成虫洞， 试求出小 P 的物流公司完成阶段性工作所需要的最短时间是多少？<br>
+思路：所有飞船同时出发，当所有计划都完成了，那么任务就完成了，那么完成时间就是所有时间中的最大值，我们要求的是最大时间中的最小值。这里需要联想到二分，对这个时间进行二分。那么关键就转化成如何写check函数。我们有m条路径，肯定是要对这些路径进行遍历操作的，那我们由此联系LCA，我们定下最大长度len之后，遍历这些边，如果长度小于等于len自然无所谓，如果长度大于len，我们详细的遍历每一小段，如果这一小段的长度改成0后可以使这条路径的长度小于len，那么我们就将这一小段标记一下，对于m条路径，假如其中有x段的长度是大于len，如果有一小段被标记x次，那么只用把这一小段的长度改成0即可。那么我们实际上就完成了check函数。遍历这条路径的时候，我们可以分两边，u-&gt;LCA,v-&gt;LCA,每次只上跳一小段，标记路径的时候，虽然路径连两个点，我们用used[u]表示u到它的父节点的路径被标记几次，只需要用一个数组预处理下u到它父节点的距离，就可以很快实现判断。<br>
+实际实现中遇到的问题：<br>
+m条路径的长度计算:d[u]+d[v]-2*d[lcd];d在建树dfs的时候进行计算，表示该点到根节点的距离<br>
+(这个方法可以用来快速计算图中任意两点之间的距离，以一点为根建立树，然后在建树的过程中将f[][]和d[]计算出来，然后想要得到两条路径之间的长度就直接用上述式子得到。另外f[][]在dfs中全部算了也行，dfs结束写个循环算也行)<br>
+另外我们可以用数组来存每个点到它父节点之间的距离，这个在dfs中实现<br>
+同时，想要快速遍历这条路径，也可以通过分别从两个点上跳到LCA来实现。而且这里上跳，每次可以上跳任意多次，因为我们得到了f[][]数组，通过这个数组，我们可以进行任意长度的上跳。将上跳长度转成2的幂相加就行。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=300010;
+struct Edge
+{
+	int u,v,lca,dis;
+}ed[N];
+int n,m;
+int h[N],e[2*N],ne[2*N],w[2*N],idx;
+void add(int a,int b,int c)
+{
+	e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;
+}
+bool cmp(Edge a,Edge b)
+{
+	return a.dis&lt;b.dis;//细心一点呐，这里需要从小到大排，这里的错误导致后面check函数出问题
+}
+int f[N][30],deep[N],d[N];
+int up[N];
+void dfs(int u,int fa)//每个点与它父节点之间肯定有路
+{
+	deep[u]=deep[fa]+1;
+	f[u][0]=fa;
+	for(int i=1;(1&lt;&lt;i)&lt;=deep[u];i++) 
+		f[u][i]=f[f[u][i-1]][i-1];
+		
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j!=fa)
+		{
+  			d[j]=d[u]+w[i];
+			up[j]=w[i];//存到父节点的距离
+			dfs(j,u);
+		}
+	}
+}
+int LCA(int u,int v)
+{
+	if(deep[u]&lt;deep[v]) swap(u,v);
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(deep[u]-(1&lt;&lt;i)&gt;=deep[v]) 
+			u=f[u][i];
+	}
+	if(u==v) return u;
+
+	for(int i=20;i&gt;=0;i--)
+		if(f[u][i]!=f[v][i]) 
+			u=f[u][i],v=f[v][i];
+			
+	return f[u][0];
+}
+int used[N];
+int check(int k)
+{
+	if(ed[m].dis&lt;=k) return 1;
+	int x=0,mx=0;
+	memset(used,0,sizeof used);
+	for(int i=m;i&gt;=1;i--)//算路径长度？
+	{
+		
+		if(ed[i].dis&lt;=k) break;
+		x++;//表示有多少条路的长度大于len
+		int u=ed[i].u,v=ed[i].v,dis=ed[i].dis-k,lca=ed[i].lca;
+		while(u!=lca)//遍历u-&gt;lca这一段，每一小段中如果有路径的长度被减去后可以使总长度符合，那么就标记一下
+		{
+			if(up[u]&gt;=dis) 
+			{
+				used[u]++;
+				mx=max(mx,used[u]);//统计被标记的最多次数，只有这个数大于等于x（需修改的路径数）,才能是满足要求
+			}
+			u=f[u][0];
+		}
+			while(v!=lca)
+			{
+				if(up[v]&gt;=dis) 
+				{
+					used[v]++;
+					mx=max(mx,used[v]);
+				}
+				v=f[v][0];
+			}
+			if(x&gt;mx) return 0;
+	}		
+	return 1;
+}
+int main()
+{
+	memset(h,-1,sizeof h);
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+	int sum=0;
+	for(int i=1;i&lt;n;i++) 
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		sum += c;
+		add(a,b,c);
+		add(b,a,c);
+	}
+	dfs(1,1);
+	//利用lca计算路径长度，求出到根节点的距离，进而计算
+	for(int i=1;i&lt;=m;i++)
+	{
+		int u,v;
+		scanf(&quot;%d%d&quot;,&amp;u,&amp;v);
+		int lca=LCA(u,v);
+		int dis=d[u]+d[v]-2*d[lca];//计算dis
+		ed[i]={u,v,lca,dis};
+	}
+	sort(ed+1,ed+1+m,cmp);
+	int l=0,r=300000000;
+	int ans;
+	while(l&lt;r)
+	{
+		int mid=(l+r)/2;
+		if(check(mid)) r=mid,ans=mid;
+		else l=mid+1;
+	}
+	printf(&quot;%d\n&quot;,ans);
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/fen-zhi/">
+              <h3 class="post-title">
+                分治
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

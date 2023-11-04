@@ -1,0 +1,1939 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://s111z.github.io</id>
+    <title>Gridea</title>
+    <updated>2023-11-04T07:10:59.641Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://s111z.github.io"/>
+    <link rel="self" href="https://s111z.github.io/atom.xml"/>
+    <subtitle>温故而知新</subtitle>
+    <logo>https://s111z.github.io/images/avatar.png</logo>
+    <icon>https://s111z.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2023, Gridea</rights>
+    <entry>
+        <title type="html"><![CDATA[Educational Codeforces Round 157 (Rated for Div. 2)补题]]></title>
+        <id>https://s111z.github.io/post/educational-codeforces-round-157-rated-for-div-2bu-ti/</id>
+        <link href="https://s111z.github.io/post/educational-codeforces-round-157-rated-for-div-2bu-ti/">
+        </link>
+        <updated>2023-11-04T06:36:44.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://codeforces.com/contest/1895/problem/A">Treasure Chest</a><br>
+题目大意：玩家初始在位置0，箱子在位置x，钥匙在位置y，玩家向左（右）移动一格花费1s，其他操作不花费时间，同时玩家只能抱着箱子行走t秒，当玩家、箱子、钥匙在同一点时，解锁成功，要求玩家最少需要多少秒。<br>
+思路：这里只用考虑箱子和钥匙的相对位置即可。<br>
+如果钥匙离玩家更近，那么直接走到箱子所花费的时间就是要求的时间；<br>
+如果箱子离玩家近，那么说明拿完钥匙要折返，于是抱着箱子往前走一点，就可以使折返时间更小。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		if(a&gt;=b) printf(&quot;%d\n&quot;,a);
+		else//box近
+		{
+			int ti=b+max(b-a-c,0);
+			printf(&quot;%d\n&quot;,ti);
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1895/problem/B">Points and Minimum Distance</a><br>
+题目大意：给一个有2*n个元素的数组，我们要将这些数凑成n对，每一对数表示一个坐标，我们要找一条路径保证每个点至少经过一次，两点之间的距离为曼哈顿距离，问这条路径长度的最小值是多少。<br>
+思路：相当于就将差值小的放一块儿减，那么就将数组排序，然后前一半全部用来作为横坐标，后一半用来做为纵坐标。横坐标内部相减累计，纵坐标同理。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int a[200];
+signed main()
+{
+	int t;
+	scanf(&quot;%lld&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%lld&quot;,&amp;n);
+		int len=2*n;
+		for(int i=1;i&lt;=len;i++) scanf(&quot;%lld&quot;,&amp;a[i]);
+		sort(a+1,a+len+1);
+		int sum=0;
+		for(int i=1;i&lt;n;i++) sum += a[i+1]-a[i];
+		for(int i=n+1;i&lt;len;i++) sum += a[i+1]-a[i];
+		printf(&quot;%lld\n&quot;,sum);
+		for(int i=1;i&lt;=n;i++)
+		{
+			printf(&quot;%d %d\n&quot;,a[i],a[i+n]);
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1895/problem/C">Torn Lucky Ticket</a><br>
+题目大意：给n个字串，每个字串的每一位都是1-9的某个数字，我们要将任意两串拼接起来，如果拼接后的字串满足，长度为偶数，同时前半段的数位和等于后半段的数位和，那么这就是个合法的拼接。问有多少个合法拼接。（注意si+sj != sj+si,同时i==j是合法的）<br>
+思路：这道题的实现思路很巧妙，我们首先分析题目，可以发现拼接后，从中间切并不一定保证前半段或者后半段一定是原来的字串。所以对每个字串可能将被从任意地方切开，那么我们就循环这个字串，记录从它每个位置切需要补一个什么样的字串上去。这里我们通过数位和与长度这两个属性来确定字串。记录结束之后，我们遍历原字串数组，累计这个字串的属性被标记了几次，那么就相当于它可以补给几个其他字串，累计一下就好 ，由于si+sj != sj+si，所以不用考虑会重复记录。另外还有一点要考虑，这个字串可以补在后面，也可以补在前面，当这字串补在后面的时候，属性是正值，但当它补在前面的时候，实际上记录它的那个mp中记录的属性应该是负数。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int sum[200010];
+char s[200010][10];
+
+signed main()
+{
+	map&lt;pair&lt;int,int&gt;,int&gt;mp;
+	int n;
+	scanf(&quot;%lld&quot;,&amp;n);
+	for(int i=1;i&lt;=n;i++)
+	{
+		scanf(&quot;%s&quot;,s[i]);
+		int l=strlen(s[i]);
+		int ssum=0;
+		for(int j=0;j&lt;l;j++) ssum += s[i][j]-'0';
+		for(int j=0;j&lt;l;j++)
+		{
+			sum[i] += s[i][j]-'0';
+			mp[{2*sum[i]-ssum,2*(j+1)-l}]++;
+		} 
+	}
+	int ans=0;
+	for(int i=1;i&lt;=n;i++)
+	{
+		int l=strlen(s[i]);
+		ans += mp[{sum[i],l}]+mp[{-sum[i],-l}];
+		//我们计算答案时就是要去找每个字串可以跟哪些字串匹配，那我们不如预处理每个字串从不同位置划分需要补的部分，那么这样的话每个字串的性质如果符合另一个字串某一划分的补就可将两者拼接
+	}
+	printf(&quot;%lld&quot;,ans);
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1895/problem/D">XOR Construction</a><br>
+题目大意：给定一个a[]={a1,a2,...,a(n-1)},a[1]=b[1]^b[2],a[2]= b[2]^b[3],...<br>
+b[]中的数在0~n-1，同时每个数都只出现一次，<br>
+求b[]<br>
+思路:a[1]=b[1]<sup>b[2]=&gt;b[2]=a[1]</sup>b[1],相当于，我们只要确定一个数就能将整个b[]都推出来（先不考虑是否合法），那么我们就将0放在第一位，推出整个b[],这时候有个新的问题，b[]是有范围的，它要在0~n-1之间，我们就需要对已经得到的数组进行处理，这里的处理方法很妙，我们推导可发现，对于0-x，二进制的每一位上，对于整个范围来说，都是0的个数&gt;=1的个数，那么我们只要在1的个数大于0的个数的时候将每个数的这一位都异或上1就可以实现0的个数&gt;=1的个数。详见<a href=""></a> 。</p>
+<pre><code class="language-cpp">#include &lt;stdio.h&gt;
+int a[200005],n;
+int main() 
+{
+	scanf(&quot;%d&quot;,&amp;n);
+	for(int i=1;i&lt;n;i++)
+	{
+        scanf(&quot;%d&quot;,&amp;a[i]);
+        a[i]^=a[i-1];
+    }//这里相当于将b第一个值定为0，然后求b[]
+
+	//将b控制在0~n-1
+	for(int j=0;1&lt;&lt;j &lt; n;j++)
+	{
+		int d=0;
+		for(int i=0;i&lt;n;i++)//访问每一个数的第j位
+			d+=(a[i]&amp;1&lt;&lt;j)==0? 1:-1;//如果a[i]的第j位是0就加1，否则减1，
+			//先算1&lt;&lt;j，那就是取a[i]的第j位
+		if(d&lt;0)//如果1比0多，这里就是要保证所有相同位中，总的1要比0少
+			for(int i=0;i&lt;n;i++)
+				a[i] ^= 1&lt;&lt;j;//每个a[i]的第j位都异或上1
+		//相邻两个数的相对01都不变，所以异或还是可以得到我们想要的a[],让0比1多就可以限制b的范围？			
+	}
+	for(int i=0;i&lt;n;i++)
+		printf(&quot;%d &quot;,a[i]);
+	return 0;
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[异或-映射]]></title>
+        <id>https://s111z.github.io/post/yi-huo-ying-she/</id>
+        <link href="https://s111z.github.io/post/yi-huo-ying-she/">
+        </link>
+        <updated>2023-11-04T06:02:53.000Z</updated>
+        <content type="html"><![CDATA[<p>将一个数组中的数映射到0~n-1,同时保证相邻两个数的异或和不变<br>
+我们以7为例<br>
+000<br>
+001<br>
+010<br>
+011<br>
+100<br>
+101<br>
+110<br>
+111<br>
+我们可以发现，不管从什么位置截断，前面的数都是0的个数&gt;=1的个数，那么我们统计数组中所有数每一位上1和0的个数，如果1的个数大于0的个数，那么我们就将数组中每个数的这一位都异或1.</p>
+<p>应用：<br>
+<a href="https://codeforces.com/contest/1658/problem/D1">388535 (Easy Version)</a><br>
+<a href="https://codeforces.com/contest/1895/problem/D">XOR Construction</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[最大团]]></title>
+        <id>https://s111z.github.io/post/zui-da-tuan/</id>
+        <link href="https://s111z.github.io/post/zui-da-tuan/">
+        </link>
+        <updated>2023-11-03T07:20:20.000Z</updated>
+        <content type="html"><![CDATA[<p>当 G′ 是图 G 的子图，且 G′ 是关于 V′ 的完全图时，子图 G' 为图 G 的团；当 G' 是团，且不是其他团的子集时，G' 为图 G 的极大团；当 G' 是极大团时，且点数最多，G' 为图 G 最大团<br>
+完全图：图中n个点，任意两点之间都有边。<br>
+极大团：实际就是一个独立的块<br>
+最大团：点数最多的极大团<br>
+最大独立集：图中的一个点集，点与点之间互不相邻(去除图中团后的点集)<br>
+最大独立集数=补图的最大团<br>
+当用数目最少的团覆盖整张图的时候，称为最小团覆盖<br>
+我们从最小团覆盖所选的这些团中每个团选一点，即可得到独立集，而显然最大独立集的中的点数</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[LCA]]></title>
+        <id>https://s111z.github.io/post/lca/</id>
+        <link href="https://s111z.github.io/post/lca/">
+        </link>
+        <updated>2023-10-28T14:21:10.000Z</updated>
+        <content type="html"><![CDATA[<p>LCA即最近公共祖先。<br>
+给定一棵树及它的根节点，每次询问给出x,y两个点，我们要求x和y的最近公共祖先（公共祖先：F既是x的祖先也是y的祖先，那么F就是公共祖先，我们要求距离两者最近的那个公共祖先，即为LCA(x,y)）<br>
+LCA的性质：<br>
+1.在所有的公共祖先中距离x和y都是最近的，<br>
+2.x,y之间的最短路径经过LCA(x,y)（这个后面点分树会用上）<br>
+3.x,y本身也可以是自己的公共祖先(当一个点是另一个点的子节点是成立)</p>
+<p>暴力（虽然会超时，但却是后面两种思维的起点）<br>
+思路：我们先根据根节点定出x,y的层级，如果x的层级比y深（y的层级比x深同理），我们让x一层一层往上，当与y同级时，如果x没和y重合，那么就是x和y一起往上找，直到x和y重合为止。<br>
+有多个询问，如果对每个询问都这么处理，显而易见，会超时。那么就需要进行优化。</p>
+<p>倍增法：<br>
+这里是对找层级进行优化，在暴力算法中，层级是一层一层往上找的，我们可以引入二进制优化，即每次上跳2<sup>i,很容易证明任何一个正整数都可以被拆成若干个2</sup>i（i为非负整数）相加，那么我们就可以这么跳。只需要在建立层级的时候，将每个点上跳2^i到哪个点记录一下即可。这里涉及到一个递推：<br>
+f[x][i]表示x上跳2^i到的点，递推关系为：<br>
+f[x][i]=f[f[x][i-1]][i-1]<br>
+解释：x上跳2<sup>i次方等价于x上跳到2</sup>(i-1)位置再上跳2<sup>(i-1),2</sup>(i-1)+2<sup>(i-1)=2</sup>i;<br>
+递推公式的意义就是方便我们的计算，因为边缘状态比较好确定，剩下的直接递推就可以得到。<br>
+除了对上跳进行优化以外，别的地方都不变，也是x先上跳到与y相同层级，然后再一起上跳。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+cont int N=500005;
+int h[N],e[2*N],ne[2*N],idx;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+int d[N];
+void dfs(int u,int fa)
+{
+    d[u]=d[fa]+1;
+    f[u][0]=fa;//上跳2^0=1,即跳到父节点
+    for(int i=1;u-(1&lt;&lt;i)&lt;=d[u];i++) f[u][i]=f[f[u][i-1]][i-1];
+    //这里的判断条件要注意一下，不能跳出去了
+    //f[x][i]只是用来记录x上跳2^i后会落在哪里，实际跳的距离还是2^i
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(j!=fa)
+        {
+            dfs(j,u);
+        }        
+    }
+}
+int LCA(int x,int y)
+{
+    if(d[x]&lt;d[y]) swap(x,y);
+    for(int i=20;i&gt;=0;i--)
+    {
+        if(d[x] - (1&lt;&lt;i)&gt;=d[y]) x=f[x][i];
+    }
+    if(x==y) return x;
+    for(int i=20;i&gt;=0;i--)
+    {
+        if(f[x][i]!=f[y][i])   //比公共祖先深度浅的祖先对两者来说都是相同的，所以这里从最大的开始看，如果不相等，就证明还没有到最近公共祖先，自然可以上跳
+            x=f[x][i],y=f[y][i];
+    }
+    return f[x][0];
+}
+int main()
+{
+    int n,m,root;
+    scanf(&quot;%d%d&quot;,&amp;n,&amp;m,&amp;root);
+    for(int i=1;i&lt;n;i++)
+    {
+        int a,b;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        add(a,b),add(b,a);
+    }    
+    dfs(root,root);
+    while(m--)
+    {
+        int a,b;
+        scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+        printf(&quot;%d&quot;,LCA(a,b));
+    }
+}
+</code></pre>
+<p>Tarjin<br>
+上面一种算法是对每个询问单独处理，如果我们可以像点分治中一样统一处理所有的询问，自然会更快。<br>
+倍增法是通过上跳来找，那我们换个思路，在建树的过程中就向下找，访问到y的时候，如果x已经被访问过，那么就有两种情况，如下图：<br>
+<img src="https://s111z.github.io/post-images/1698584609828.jpg" alt="" loading="lazy"><br>
+上图中第一种情况，x是y的祖先，我们dfs()传入两个参数，当前节点u和父节点fa，那么我们在访问y的时候，发现已经访问过x了，就只用去找y的祖先，就会找到x，具体实现我们后面结合代码来说<br>
+第二种情况，也是去找y的祖先，可以找到u，具体实现结合代码来说。</p>
+<pre><code class="language-cpp">void dfs(int u,int fa)
+{
+    f[u]=u;
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(j!=fa)
+        {
+            dfs(j,u);
+            f[j]=u;
+        }
+    }
+    //因为是一层一层往里面搜的，当前层搜的u的父节点就是本身，对于第一种情况往上找一定会找到x；
+    //对于第二种情况，访问x层时，实际上还没有结束u层，那么f[u]=u，所以y往上找一定会找到u；
+    for(int i=hq[u];i!=-1;i=neq[i])
+    {
+        int j=eq[i];
+        if(vis[j]) ans[w[i]]=find(j);
+    }
+}
+</code></pre>
+<p>另外在询问中，对于一个x，可能有多个y，而且还要记录它们是第几个询问，所以我们不妨也用邻接表来存。<br>
+完整代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=500010;//开大一点
+int h[N],e[2*N],ne[2*N],idx;
+int hq[N],eq[2*N],neq[2*N],w[2*N],idxq;
+void add(int a,int b)
+{
+    e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+void addq(int a,int b,int c)
+{
+    eq[idxq]=b,w[idxq]=c,neq[idxq]=hq[a],hq[a]=idxq++;    
+}
+int ans[N],f[N],vis[N];
+int find(int x)
+{
+    return x==f[x]?x:f[x]=find(f[x]);
+}
+void Tarjin(int u)
+{
+    vis[u]=1;
+    f[u]=u;
+    for(int i=h[u];i!=-1;i=ne[i])
+    {
+        int j=e[i];
+        if(!vis[j])
+        {
+            Tarjin(j);
+            f[j]=u;//这里是给j赋父节点
+        }
+    }
+    for(int i=hq[u];i!=-1;i=neq[i])
+    {
+        int j=eq[i];
+        if(vis[j])
+        {
+            ans[w[i]]=find(j);
+        }
+    }
+}
+int main()
+{
+    memset(h,-1,sizeof h);
+    memset(hq,-1,sizeof hq);
+    int n,m,s;
+    scanf(&quot;%d%d%d&quot;,&amp;n,&amp;m,&amp;s);
+    for(int i=1;i&lt;n;i++)
+    {
+        int x,y;
+        scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+        add(x,y),add(y,x);//只说有边，没说是有向边
+    }
+    for(int i=1;i&lt;=m;i++)
+    {
+        int x, y;
+        scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+        addq(x,y,i),addq(y,x,i);
+	}
+    Tarjin(s);
+    for(int i=1;i&lt;=m;i++)
+    {
+        printf(&quot;%d\n&quot;,ans[i]);
+    }
+}
+</code></pre>
+<p>LCA应用<br>
+LCA的应用在于用来处理图或树中指定端点的路径，LCA的存在相当于给了这条路径一个顺序，将这一条路拆成两半供我们操作。<br>
+下面的例1，就利用LCA对路径实现顺序操作的实现，因为差分数组一定是顺序访问才有效；<br>
+而例2，则是给出了利用上跳的原理遍历整条路，同时类比fa[][]数组来统计路径上的最小值。<br>
+LCA也可以理解成人为的给无向图赋上了方向，一条边如果有一个指定的顺序来进行操作，就会简化很多。</p>
+<p>LCA+差分<br>
+eg1:<a href="https://www.luogu.com.cn/problem/P3128">Max Flow P</a><br>
+题目大意：有n个节点，用n-1条边连接，所有的节点都连通了。给出m条路劲，第i条路径为从节点si到ti。每给出一条路径，路径上所有节点的权值都加1，输出最大权值点的权值。<br>
+思路：“每给出一条路径，路径上所有节点的权值都加1”这句话很重要，很明显，暴力的思路是遍历这条路，然后将这条路上的点权都加1，但显而易见，会超时，但是这种很明显是对一段区间进行统一操作，很容易想到差分。我们接着往下想，差分是在一维区间中，在从前往后遍历的过程中将数累计出来，我们要想差分就一定要实现一个点先被访问，一个点后被访问，那么如何来实现呢？很明显对于题目中的无向图，没办法指定一条路径使m条路径中都是一个点先被访问，一个点后被访问。这里我们引入LCA，对于任意两个点，它们都有一个LCA点，这个点一定在这条路径上，所以我们可以以LCA为界，将路劲分为两半，我们可以先建立有向图，然后往下访问的过程中一定是先访问到LCA，那么如果我们在回溯的过程中开始累计，不就可以实现差分数组累计的过程嘛，另外要注意，LCA会被回溯两次，所以我们在LCA处要--，不能全减在fa[LCA][0]上。那么由此我们就实现了累计，剩下的，我们只要在遍历的过程中统计一下即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=50010;
+int h[N],e[2*N],ne[2*N],idx;
+int deep[N],vis[N],f[N][30],d[N];
+void add(int a,int b)
+{
+	e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+}
+void dfs(int u,int fa)
+{
+	deep[u]=deep[fa]+1;
+	f[u][0]=fa;
+	for(int i=1;(1&lt;&lt;i)&lt;=deep[u];i++)
+	{
+		f[u][i]=f[f[u][i-1]][i-1];
+	}
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j!=fa) dfs(j,u);
+	}
+}
+int LCA(int x,int y)
+{
+	if(deep[x]&lt;deep[y]) swap(x,y);
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(deep[x]-(1&lt;&lt;i)&gt;=deep[y]) x=f[x][i];
+	}
+	if(x==y) return x;
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(f[x][i]!=f[y][i])
+		{
+			x=f[x][i];
+			y=f[y][i];
+		}
+	}
+	return f[x][0];
+}
+int ans=0;
+void getans(int u)
+{
+	vis[u]=true;
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(!vis[j])
+		{
+			getans(j);
+			d[u] += d[j];
+		}
+	}
+	ans = max(ans,d[u]);
+}
+int main()
+{
+	memset(h,-1,sizeof h);
+	int n,k;
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+	for(int i=0;i&lt;n-1;i++)
+	{
+		int x,y;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+		add(x,y),add(y,x);
+	}	
+	dfs(1,1);
+	//printf(&quot;ok&quot;);
+	for(int i=0;i&lt;k;i++)
+	{
+		int x,y;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+		int lca=LCA(x,y);
+		d[x]++,d[y]++,d[lca]--,d[f[lca][0]]--;
+	}
+	getans(1);
+	printf(&quot;%d&quot;,ans);
+}
+</code></pre>
+<p>LCA+最大生成树<br>
+<a href="https://www.luogu.com.cn/problem/P1967">货车运输</a><br>
+题目大意：A 国有n 座城市，编号从1到n，城市之间有m条双向道路。每一条道路对车辆都有重量限制，简称限重。<br>
+现在有 q 辆货车在运输货物， 司机们想知道每辆车在不超过车辆限重的情况下，最多能运多重的货物。<br>
+我们对于每辆货车，知道它的起点和终点。<br>
+思路：这里给的是图，所以两点之间的路径不只有一条，我们肯定是要最大的（沿途每段都最大），该如何确定呢？我们可以根据最小生成树来推出最大生成树，即将边按照权重从大到小排序，遍历每条边，判断每条边连接的两点的祖先是否连在一起，如果连在一起就说明两点之间已经有更大的路径可以将它们连通了，这条边肯定不会走，如果不连在一起就说明这边边必须走，那么把它加入最大生成树中即可。我们得到最大生成树，然后要想实现题目要求，两点之间走的路径一定是最大生成树中的边。这里实际上对于两点可以使用暴力来求，即从一点开始dfs，但是显而易见会超时，那么就要进行优化。我们引入LCA进行优化，LCA的实现过程就是两个点找最近公共祖先，这个最近公共祖先一定在路径上，那么我们在进行LCA查找的过程中就相当于遍历了这条路径，而且是以一种很高效的方式遍历了这条路径，在这个过程中，路径上边权的最小值自然可以得到。由于LCA查找的过程是不断上跳，那么我们就要用一个数组来记录，被跳过的这一段中的最小边权。<br>
+我们现在来讨论这个数组：<br>
+j上跳2<sup>i，可以分成两段，分别是j~j-2</sup>(i-1) ,j-2<sup>(i-1)~j-2</sup>i，那么这一段的最小值即w[j][i]就是由这两段取最小得到的，这种递推，我们只要将初值(边界值，i=0)赋一下,剩下的就可以启动递推来计算。然后上跳过程中就可以直接用这个来统计。<br>
+至此我们就讨论完毕。该题的主要步骤就是：1.产生最大生成树；2.LCA预处理（分两部分：一部分dfs（）建立有向的树，另一部分预处理fa[][]和w[][]）；3.LCA找答案。</p>
+<pre><code class="language-cpp">wq[j][i]=min(wq[j][i-1],wq[fa[j][i-1]][i-1]);
+//从小到大进行递推，只要递推开始赋值了就可，我们在预处理每棵树的时候赋了值
+</code></pre>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=100010;
+int n,m;
+int vis[N];
+//kruscal算法最好用结构体来存边
+struct edge{
+	int u,v,w;
+}e1[2*N],e2[2*N];
+int h[N],e[N],ne[N],w[N];
+int idx1,idx2;
+bool cmp(edge x,edge y)
+{
+	return x.w&gt;y.w;
+}
+void add1(int a,int b,int c)
+{
+	e1[idx1++]={a,b,c};
+}//存原图
+void add2(int a,int b,int c)
+{
+	w[idx2]=c,e[idx2]=b,ne[idx2]=h[a],h[a]=idx2++;
+}//存最大生成树
+int f[N];
+int find(int x)
+{
+	return x==f[x]?x:f[x]=find(f[x]);
+}
+void kruscal()
+{
+	sort(e1,e1+idx1,cmp);
+	for(int i=1;i&lt;=n;i++) f[i]=i;//
+	for(int i=0;i&lt;idx1;i++)
+	{
+		int u=e1[i].u,v=e1[i].v;
+		if(find(u)!=find(v))
+		{
+			f[find(u)]=find(v);//
+			add2(u,v,e1[i].w);
+			add2(v,u,e1[i].w);//
+		}
+	}	
+}
+int fa[N][30],wq[N][30];
+int d[N];
+void dfs(int u)
+{
+	vis[u]=1;
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(!vis[j])
+		{
+			fa[j][0]=u;
+			wq[j][0]=w[i];
+			d[j]=d[u]+1;
+			dfs(j);//
+		}
+	}
+}
+int LCA(int x,int y)
+{
+	if(find(x)!=find(y)) return -1;//不连通，给的是图
+	int ans=1e9;
+	if(d[x]&lt;d[y]) swap(x,y);
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(d[x]-(1&lt;&lt;i)&gt;=d[y]) 
+		{
+			x=fa[x][i];
+			ans=min(ans,wq[x][i]);//在上跳过程中更新最小距离
+		}
+	}
+	if(x==y) return ans;
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(fa[x][i]!=fa[y][i])
+		{
+			x=fa[x][i],y=fa[y][i];
+			ans=min(ans,wq[x][i]);
+			ans=min(ans,wq[y][i]);
+		}
+	}
+	ans=min(ans,wq[x][0]);
+	ans=min(ans,wq[y][0]);
+	return ans;//找最近公共祖先节点的过程中就遍历了这条路径
+}
+int main()
+{
+	memset(h,-1,sizeof h);
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+	for(int i=0;i&lt;m;i++)//
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		add1(a,b,c);
+	}
+	kruscal();
+
+	for(int i=1;i&lt;=n;i++)
+	{
+		if(!vis[i]) 
+		{
+			d[i]=1;//这个点没被访问过，那么这个点一定是一棵树的起点（根节点），父节点是本身，上跳为正无穷
+			dfs(i);
+			fa[i][0]=i;//
+			wq[i][0]=1e9;//
+		}
+	}
+	for(int i=1;i&lt;=20;i++)
+	{
+		for(int j=1;j&lt;=n;j++)
+		{
+			fa[j][i]=fa[fa[j][i-1]][i-1];
+			wq[j][i]=min(wq[j][i-1],wq[fa[j][i-1]][i-1]);//从小到大进行递推，只要递推开始赋值了就可，我们在预处理每棵树的时候赋了值
+		}
+	}
+	//printf(&quot;wq&quot;);
+	int q;
+	scanf(&quot;%d&quot;,&amp;q);
+	for(int i=0;i&lt;q;i++)
+	{
+		int x,y;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;y);
+		int t=LCA(x,y);
+		printf(&quot;%d\n&quot;,t);
+	}
+}
+</code></pre>
+<p>LCA+二分<br>
+<a href="https://www.luogu.com.cn/problem/P2680">运输计划</a><br>
+题目大意：L 国有 n 个星球，还有 n−1 条双向航道，每条航道建立在两个星球之间，这 n−1 条航道连通了 L 国的所有星球。<br>
+小 P 掌管一家物流公司， 该公司有很多个运输计划，每个运输计划形如：有一艘物流飞船需要从 ui号星球沿最快的宇航路径飞行到vi号星球去。显然，飞船驶过一条航道是需要时间的，对于航道 j，任意飞船驶过它所花费的时间为 tj，并且任意两艘飞船之间不会产生任何干扰。<br>
+为了鼓励科技创新， L 国国王同意小 P 的物流公司参与 L 国的航道建设，即允许小 P 把某一条航道改造成虫洞，飞船驶过虫洞不消耗时间。<br>
+在虫洞的建设完成前小 P 的物流公司就预接了 m 个运输计划。在虫洞建设完成后，这 m 个运输计划会同时开始，所有飞船一起出发。当这 m 个运输计划都完成时，小 P 的物流公司的阶段性工作就完成了。<br>
+如果小 P 可以自由选择将哪一条航道改造成虫洞， 试求出小 P 的物流公司完成阶段性工作所需要的最短时间是多少？<br>
+思路：所有飞船同时出发，当所有计划都完成了，那么任务就完成了，那么完成时间就是所有时间中的最大值，我们要求的是最大时间中的最小值。这里需要联想到二分，对这个时间进行二分。那么关键就转化成如何写check函数。我们有m条路径，肯定是要对这些路径进行遍历操作的，那我们由此联系LCA，我们定下最大长度len之后，遍历这些边，如果长度小于等于len自然无所谓，如果长度大于len，我们详细的遍历每一小段，如果这一小段的长度改成0后可以使这条路径的长度小于len，那么我们就将这一小段标记一下，对于m条路径，假如其中有x段的长度是大于len，如果有一小段被标记x次，那么只用把这一小段的长度改成0即可。那么我们实际上就完成了check函数。遍历这条路径的时候，我们可以分两边，u-&gt;LCA,v-&gt;LCA,每次只上跳一小段，标记路径的时候，虽然路径连两个点，我们用used[u]表示u到它的父节点的路径被标记几次，只需要用一个数组预处理下u到它父节点的距离，就可以很快实现判断。<br>
+实际实现中遇到的问题：<br>
+m条路径的长度计算:d[u]+d[v]-2*d[lcd];d在建树dfs的时候进行计算，表示该点到根节点的距离<br>
+(这个方法可以用来快速计算图中任意两点之间的距离，以一点为根建立树，然后在建树的过程中将f[][]和d[]计算出来，然后想要得到两条路径之间的长度就直接用上述式子得到。另外f[][]在dfs中全部算了也行，dfs结束写个循环算也行)<br>
+另外我们可以用数组来存每个点到它父节点之间的距离，这个在dfs中实现<br>
+同时，想要快速遍历这条路径，也可以通过分别从两个点上跳到LCA来实现。而且这里上跳，每次可以上跳任意多次，因为我们得到了f[][]数组，通过这个数组，我们可以进行任意长度的上跳。将上跳长度转成2的幂相加就行。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+const int N=300010;
+struct Edge
+{
+	int u,v,lca,dis;
+}ed[N];
+int n,m;
+int h[N],e[2*N],ne[2*N],w[2*N],idx;
+void add(int a,int b,int c)
+{
+	e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;
+}
+bool cmp(Edge a,Edge b)
+{
+	return a.dis&lt;b.dis;//细心一点呐，这里需要从小到大排，这里的错误导致后面check函数出问题
+}
+int f[N][30],deep[N],d[N];
+int up[N];
+void dfs(int u,int fa)//每个点与它父节点之间肯定有路
+{
+	deep[u]=deep[fa]+1;
+	f[u][0]=fa;
+	for(int i=1;(1&lt;&lt;i)&lt;=deep[u];i++) 
+		f[u][i]=f[f[u][i-1]][i-1];
+		
+	for(int i=h[u];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j!=fa)
+		{
+  			d[j]=d[u]+w[i];
+			up[j]=w[i];//存到父节点的距离
+			dfs(j,u);
+		}
+	}
+}
+int LCA(int u,int v)
+{
+	if(deep[u]&lt;deep[v]) swap(u,v);
+	for(int i=20;i&gt;=0;i--)
+	{
+		if(deep[u]-(1&lt;&lt;i)&gt;=deep[v]) 
+			u=f[u][i];
+	}
+	if(u==v) return u;
+
+	for(int i=20;i&gt;=0;i--)
+		if(f[u][i]!=f[v][i]) 
+			u=f[u][i],v=f[v][i];
+			
+	return f[u][0];
+}
+int used[N];
+int check(int k)
+{
+	if(ed[m].dis&lt;=k) return 1;
+	int x=0,mx=0;
+	memset(used,0,sizeof used);
+	for(int i=m;i&gt;=1;i--)//算路径长度？
+	{
+		
+		if(ed[i].dis&lt;=k) break;
+		x++;//表示有多少条路的长度大于len
+		int u=ed[i].u,v=ed[i].v,dis=ed[i].dis-k,lca=ed[i].lca;
+		while(u!=lca)//遍历u-&gt;lca这一段，每一小段中如果有路径的长度被减去后可以使总长度符合，那么就标记一下
+		{
+			if(up[u]&gt;=dis) 
+			{
+				used[u]++;
+				mx=max(mx,used[u]);//统计被标记的最多次数，只有这个数大于等于x（需修改的路径数）,才能是满足要求
+			}
+			u=f[u][0];
+		}
+			while(v!=lca)
+			{
+				if(up[v]&gt;=dis) 
+				{
+					used[v]++;
+					mx=max(mx,used[v]);
+				}
+				v=f[v][0];
+			}
+			if(x&gt;mx) return 0;
+	}		
+	return 1;
+}
+int main()
+{
+	memset(h,-1,sizeof h);
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+	int sum=0;
+	for(int i=1;i&lt;n;i++) 
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		sum += c;
+		add(a,b,c);
+		add(b,a,c);
+	}
+	dfs(1,1);
+	//利用lca计算路径长度，求出到根节点的距离，进而计算
+	for(int i=1;i&lt;=m;i++)
+	{
+		int u,v;
+		scanf(&quot;%d%d&quot;,&amp;u,&amp;v);
+		int lca=LCA(u,v);
+		int dis=d[u]+d[v]-2*d[lca];//计算dis
+		ed[i]={u,v,lca,dis};
+	}
+	sort(ed+1,ed+1+m,cmp);
+	int l=0,r=300000000;
+	int ans;
+	while(l&lt;r)
+	{
+		int mid=(l+r)/2;
+		if(check(mid)) r=mid,ans=mid;
+		else l=mid+1;
+	}
+	printf(&quot;%d\n&quot;,ans);
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[分治]]></title>
+        <id>https://s111z.github.io/post/fen-zhi/</id>
+        <link href="https://s111z.github.io/post/fen-zhi/">
+        </link>
+        <updated>2023-10-27T06:00:15.000Z</updated>
+        <content type="html"><![CDATA[<p>点分治<br>
+点分树（动态点分治）<br>
+分治FFT<br>
+线段树分治<br>
+“动态DP”&amp;动态树分治<br>
+关于分治，不需要考虑函数的具体细节，我们只要明确函数能实现什么功能，并正确调用即可。所以关键在于，明确在不断分小的过程中，什么操作是相同的，递归函数的意义就是来实现这一相同操作。<br>
+明确两点：如何往小的分（或是说一遍操作后，下一遍进行什么操作，要把层级理清楚）；每层操作时什么是相同的。<br>
+<a href="https://www.luogu.com.cn/problem/P1010">幂次方</a><br>
+<img src="https://s111z.github.io/post-images/1698386619039.png" alt="" loading="lazy"><br>
+题目大意：给定一个数n，我们将它拆成若干个2的幂相加，例如：<br>
+137=2<sup>7+2</sup>3+2^0<br>
+7=2<sup>2+2+2</sup>0<br>
+3=2+2^0<br>
+用2(c）表示2的c次幂<br>
+所以137=2(2(2)+2+2(0))+2(2+2(0))+2(0)<br>
+我们要使拆解后幂最高的只到2，请输出拆解后的结果。<br>
+思路：我们以137为例，第一次拆解即将它转化成二进制，然后再对拆出来的指数进一步拆解，拆解过程也是将它转成二进制。那么我们就可得到这是一层一层深入，一点一点将问题化小的过程，就是分治。<br>
+关于分治，不需要考虑函数的具体细节，我们只要明确函数能实现什么功能，并正确调用即可。所以关键在于，明确在不断分小的过程中，什么操作是相同的，递归函数的意义就是来实现这一相同操作。对于这道题，相同的操作就是拆解成二进制的过程，因为对不合适的指数进行拆解也是将其进行二进制拆解。<br>
+落实到这道题，有些细节需要处理一下，首先是拆解的过程，得到的二进制数上的01值是从右往左的，但是我们想要的输出是从左往右的，那么就需要将拆解结果先存一下，然后按照我们想要的顺序进行循环。另外在输出的时候涉及到括号和加号，需要判断一下在什么位置怎么输入比较好。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int s[100];
+void ct(int k)//2^k
+{
+	if(k==0) 
+	{
+		cout&lt;&lt;&quot;0&quot;;
+		return;
+	}
+	if(k==1)
+	{
+		cout&lt;&lt;&quot;&quot;;
+		return;
+	}
+	if(k==2)
+	{
+		cout&lt;&lt;&quot;2&quot;;
+		return;
+	}
+	int i=0;
+	vector&lt;int&gt;p;//因为要从大到小
+	while(k)
+	{
+		if(k%2) p.push_back(i);
+		i++;
+		k /= 2;
+	}
+	for(int i=p.size()-1;i&gt;=0;i--)
+	{
+		if(i!=p.size()-1) cout&lt;&lt;&quot;+&quot;;
+		cout&lt;&lt;&quot;2&quot;;
+		if(p[i]!=1)cout&lt;&lt;&quot;(&quot;;
+		ct(p[i]);
+		if(p[i]!=1)cout&lt;&lt;&quot;)&quot;;
+	}
+}
+int main()
+{
+	//这个题关键在于理解题目，第一次分是将原数转成二进制，第二次分是将指数转成二进制，第三次……
+	//本质上都是将数转成二进制
+	int n;
+	cin&gt;&gt;n;
+	int t=n;
+	ct(n);
+}
+</code></pre>
+<h2 id="点分治">点分治</h2>
+<p>这里一定要好好补一下这个题，上回为了一个题熬到半夜还是在上回。<br>
+言归正传，来讨论下这道题。<br>
+<a href="https://www.luogu.com.cn/problem/P3806">【模板】点分治 1</a><br>
+题目大意：给定一棵有n个点的树，询问树上距离为k的点对是否存在。(有m个询问)<br>
+数据范围：n &lt; 1e4,m &lt; 100<br>
+思路：这道题有两个卡点，一个是点分治，另一个是对询问的处理。<br>
+点分治：<br>
+对于这道题，暴力的解法就是对每个点进行dfs，不用多想，一定会超时。那么我们就要考虑优化，这里的优化是从树的重心开始访问，树上的点的距离分为两类，一类是跨过重心的，一种是在重心的同一侧，即在同一支路上。跨过重心的就是两个点到根节点的距离相加，不跨过重心的情况，我们可以对这条支路分治，把它转化为跨过重心的情况。那么问题就转化成了如何对跨过重心的情况进行处理。我们的处理方式是找出重心，计算所有点到重心的距离，将这些距离写入dis[],对dis排序，然后用尺取法（双指针）统计出和为k的有多少对，当然，这样的话，在一条支路上的会被误统计进去，因为我们只从数值上进行考虑，同一支路上的点距离不能这么算，对此，我们的解决办法就是，对于重心的每一个子节点进行一次同样的getans()处理，再用前面的结果减去这里得到的结果。<br>
+对询问的处理，这里才是卡点，我们按照上面的叙述，很容易将代码写成对于每一个询问都建一遍树，但是实际上，这样会超时，所以我们的处理是，用一个数组来记录询问，同时用一个数组ans来记录每个询问的答案，getans()函数再加一个自变量sign，对于重心的查找时，让sign=1，里面每次等于k的时候，ans[i]+=sign;对于重心子节点查找时，让sign=-1,里面每次等于k的时候，ans[i]-=sign;这样就是实现了ans[]的统计，我们只用在主函数中执行一次fz(),在getans()中遍历ask[]数组，进而获取ans[]。然后遍历ans[],如果ans[i]非0，就判是，否则判否。<br>
+每一块函数:<br>
+找重心：</p>
+<pre><code class="language-cpp">void getroot(int u,int fa)//x为当前点，fa为父亲节点
+{
+    f[u]=0,siz[u]=1;//f表示这个点最大子树的大小，siz是这个点子树大小的和
+    for(int i=h[u];i!=-1;i=ne[i])//枚举儿子
+      {
+      	int y=e[i];
+      	if(use[y]||y==fa) continue;//use表示之前遍历过了，这里没啥用
+      	getroot(y,u);//往下遍历
+      	siz[u]+=siz[y];
+      	f[u]=max(f[u],siz[y]);//更新f
+      	
+      }
+    f[u]=max(f[u],Siz-siz[u]);//Siz表示在现在这棵子树中点的总数，开始时Siz=n，除了枚举的儿子所在的子树外，还有一棵子树是上面的那一堆，容斥原理
+    if(f[u]&lt;mx) 
+	{
+		mx=f[u];
+		rt=u;//更新root
+	}
+}
+</code></pre>
+<p>获得到根节点的距离</p>
+<pre><code class="language-cpp">void getd(int x,int fa)
+{
+	dis[++cnt]=d[x];//d[x]实际上可以通过增加一个自变量来替换，主要是记录x点对应的长度，这个长度是在上一层中得到的，所以要么增加一个自变量传入函数，要么用全局变量d[]来记录。
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j==fa||use[j]) continue; 
+		d[j]=d[x]+w[i];
+		getd(j,x);
+	}
+}
+</code></pre>
+<p>获得ans[]</p>
+<pre><code class="language-cpp">void getans(const int &amp;x,int w,const int sign)
+{
+	cnt=0;
+	d[x]=w;
+	getd(x,0);
+	sort(dis+1,dis+1+cnt);
+	for(int i=1;i&lt;=m;i++)//这里就是遍历处理询问
+	{
+		int l=1,r=cnt;
+		while(l&lt;r)//用二分优化一下也行，但对于这题没那么必要
+		{
+			if(dis[l]+dis[r]&lt;=ask[i])
+			{
+				if(dis[l]+dis[r]==ask[i]) ans[i] += sign;
+				++l;
+			}
+			else --r;
+		}
+	}
+}
+</code></pre>
+<p>分治函数</p>
+<pre><code class="language-cpp">void fz(const int &amp;x)//x就是重心
+{
+	use[x]=1;
+	getans(x,0,1);
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(use[j]) continue;
+		getans(j,w[i],-1);
+		Siz=siz[j],mx=1e9+7;
+		getroot(j,x);
+		fz(rt);	
+	}
+}
+</code></pre>
+<p>完整代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+
+const int N=10005;
+const int INF=10000005;
+int k;
+int h[40010],e[40010],ne[40010],w[40010],idx;
+int use[20010];
+int d[20010],dis[N];
+int f[20010],siz[20010];
+int cnt,Siz,rt=1;
+int ans[N];
+int mx=1e9+7;
+int n,m;
+int ask[N];
+void add(const int &amp;a,const int &amp;b,const int &amp;c)
+{
+	w[idx]=c,e[idx]=b,ne[idx]=h[a],h[a]=idx++;
+	w[idx]=c,e[idx]=a,ne[idx]=h[b],h[b]=idx++;
+}
+//求重心
+void getroot(int u,int fa)//x为当前点，fa为父亲节点
+{
+    f[u]=0,siz[u]=1;//f表示这个点最大子树的大小，siz是这个点子树大小的和
+    for(int i=h[u];i!=-1;i=ne[i])//枚举儿子
+      {
+      	int y=e[i];
+      	if(use[y]||y==fa) continue;//use表示之前遍历过了，这里没啥用
+      	getroot(y,u);//往下遍历
+      	siz[u]+=siz[y];
+      	f[u]=max(f[u],siz[y]);//更新f
+      }
+    f[u]=max(f[u],Siz-siz[u]);//Siz表示在现在这棵子树中点的总数，开始时Siz=n，除了枚举的儿子所在的子树外，还有一棵子树是上面的那一堆，容斥原理
+    if(f[u]&lt;mx) 
+	{
+		mx=f[u];
+		rt=u;//更新root
+	}
+}
+
+//求到重心的距离
+void getd(int x,int fa)
+{
+	
+	dis[++cnt]=d[x];
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(j==fa||use[j]) continue; 
+		d[j]=d[x]+w[i];
+		getd(j,x);
+
+	}
+}
+//求答案
+void getans(const int &amp;x,int w,const int sign)
+{
+	cnt=0;
+	d[x]=w;
+	getd(x,0);
+	sort(dis+1,dis+1+cnt);
+	for(int i=1;i&lt;=m;i++)
+	{
+		int l=1,r=cnt;
+		while(l&lt;r)
+		{
+			if(dis[l]+dis[r]&lt;=ask[i])
+			{
+				if(dis[l]+dis[r]==ask[i]) ans[i] += sign;
+				++l;
+			}
+			else --r;
+		}
+	}
+
+}
+//分治划分
+
+void fz(const int &amp;x)//x就是重心
+{
+	use[x]=1;
+	getans(x,0,1);
+	for(int i=h[x];i!=-1;i=ne[i])
+	{
+		int j=e[i];
+		if(use[j]) continue;
+		getans(j,w[i],-1);
+		Siz=siz[j],mx=1e9+7;
+		getroot(j,x);//找子树中的重心
+		fz(rt);	
+	}
+}
+
+signed main()
+{
+	f[0]=1e9+7;
+	memset(h,-1,sizeof h);
+
+	scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+	for(int i=0;i&lt;n-1;i++)
+	{
+		int a,b,c;
+		scanf(&quot;%d%d%d&quot;,&amp;a,&amp;b,&amp;c);
+		add(a,b,c);
+	}
+
+	Siz=n;
+	getroot(1,1);
+	int root=rt;
+	for(int i=0;i&lt;=n;i++)use[i]=0;
+	for(int i=1;i&lt;=m;i++)
+	{
+		scanf(&quot;%d&quot;,&amp;ask[i]);
+	}
+	fz(root);
+	for(int i=1;i&lt;=m;i++)
+	{
+		if(ans[i]&gt;0) printf(&quot;AYE\n&quot;);
+		else printf(&quot;NAY\n&quot;);
+	}
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ACDC16]]></title>
+        <id>https://s111z.github.io/post/acdc16/</id>
+        <link href="https://s111z.github.io/post/acdc16/">
+        </link>
+        <updated>2023-10-25T11:08:09.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://codeforces.com/contest/876/problem/B">Divisiblity of Differences</a><br>
+题目大意：有一个大小为n的多集，我们要从中选k个数，使得任意两数之差可以整除m，问是否成立。<br>
+思路：任意两数之差可以整除m，仔细想想就会发现，只要它们模m的结果相同即可。所以我们需要做的就是统计，每个数模上k后的值，然后统计每个余数对应的数有几个，如果个数大于等于k，那么就成立。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+vector&lt;int&gt;p[100010];
+int main()
+{
+	int n,k,m;//n是数组个数，k是需要挑的个数，m是除数
+	scanf(&quot;%d%d%d&quot;,&amp;n,&amp;k,&amp;m);
+	map&lt;int,int&gt;mp;
+	for(int i=0;i&lt;n;i++)
+	{
+		int x;
+		scanf(&quot;%d&quot;,&amp;x);
+		mp[x%m]++;
+		p[x%m].push_back(x);//因为要输出原数，所以还是要记一下
+	}
+	int f=-1;
+	for(auto t:mp)
+	{
+		if(t.second&gt;=k)
+		{
+			f=t.first;
+			break;
+			
+		}
+	}
+	if(f==-1) printf(&quot;No&quot;);
+	else 
+	{
+		printf(&quot;Yes\n&quot;);
+		int c=0;
+		for(auto it:p[f])
+			{
+				cout&lt;&lt;it&lt;&lt;&quot; &quot;;
+				c++;
+				if(c==k) break;
+			}
+	}
+	
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1217/problem/A">Creating a Character</a><br>
+题目大意：我们给定数字st，it表示角色初始的力量和智慧，现在有n个技能点，可以分给力量和智慧，我们现在要求能够创造出多少个不同的角色，st和it只要有一个不同就算不同。另外要求st严格大于it，算一个合格的角色，只有合格才算角色。<br>
+思路：这道题切忌st和it都关注，我们只要关注一个量，求出其上下限即可。这里我们看st，上限是将n全部分给它，下限是st+es-1=it+n-es,但是要注意有st远小于it的情况，即st+n&lt;=it，这种直接判否就可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int st,it,n;
+		scanf(&quot;%d%d%d&quot;,&amp;st,&amp;it,&amp;n);
+		if(st+n&lt;=it)
+		{
+			printf(&quot;0\n&quot;);
+		}
+		else
+		{
+			int c=it+n+1-st;
+			//cout&lt;&lt;&quot;c=&quot;&lt;&lt;c&lt;&lt;endl;
+			int x=ceil(c*1.0/2);
+			//cout&lt;&lt;&quot;x=&quot;&lt;&lt;x&lt;&lt;endl;
+			x=max(x,0);
+			cout&lt;&lt;n-x+1&lt;&lt;endl;
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/762/problem/A">k-th divisor</a><br>
+题目大意：给定两个数n、k，要求n的第k小的因数。<br>
+思路：第一种方法是暴力；第二种方法是对顶堆，但实际上是没必要的；</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+signed main()
+{
+	int n,k;
+	scanf(&quot;%lld%lld&quot;,&amp;n,&amp;k);
+	set&lt;int&gt;s;
+	for(int i=1;i&lt;=n/i;i++)
+	{
+		if(n%i==0) s.insert(i),s.insert(n/i);
+	}
+	if(s.size()&gt;=k) 
+	{
+		vector&lt;int&gt;a;
+		for(auto t:s) a.push_back(t);
+		printf(&quot;%lld\n&quot;,a[k-1]);
+	}
+	else printf(&quot;-1\n&quot;);
+}
+</code></pre>
+<p>//set最大能放268435455个元素，差不多是2e8，再大就要考虑别的数据结构了。</p>
+<p><a href="https://codeforces.com/contest/1513/problem/C">Add One</a><br>
+题目大意：给定一个数n，每次操作将每一位数加1，得到一个新的数，然后继续进行操作，总共操作k次，问最后得到的数有多少位。（例 对19进行一次操作，得到210）<br>
+思路1：每一位上的数字实际上都是0-9，那我们干脆从10开始找规律：我们对10进行次数讨论：<br>
+d[i]表示进行i次操作后的位数<br>
+次数i：<br>
+0-8：d[i]=2;<br>
+9：d[i]=3;<br>
+i&gt;9:d[i]=d[i-1]+d[i-2];<br>
+这里实际上需要多写一些找规律。<br>
+实际上单纯 找规律，不容易推出来，详细的思路见思路2后<br>
+实现1：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int dp[200010];
+const int mod=1e9+7;
+int main()
+{
+	for(int i=0;i&lt;9;i++) dp[i]=2;
+	dp[9]=3;
+	for(int i=10;i&lt;=200010;i++) dp[i]=dp[i-9]+dp[i-10],dp[i]%=mod;
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,m;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		int ans=0;
+		while(n)
+		{
+			int x=n%10;
+			if(x+m &gt;= 10) ans += dp[x+m-10];		
+			else  ans += 1;
+			ans %= mod;
+			n /= 10;
+		}
+		printf(&quot;%d\n&quot;,ans);
+	}
+}
+</code></pre>
+<p>思路2：d[i][j]//对i进行j次操作<br>
+i只能取0-9的数，<br>
+当进行的操作不会让这个数升位的时候，就是1；如果让这个数变成10，那么就用<br>
+d[i][j]=(d[0][i+j-10]+d[1][i+j-10])%mod;<br>
+来计算长度，d[0][]、d[1][]会随着次数的增加而改变。</p>
+<pre><code class="language-cpp">//by czy
+#include&lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+int t,dp[10][200015],n,m,res;
+signed main()
+{
+	ios::sync_with_stdio(false);cin.tie(0);cout.tie(0);
+	for(int i=0;i&lt;10;++i)
+	{
+		dp[i][0]=1;
+	}
+	for(int i=1;i&lt;200010;++i)
+	{
+		for(int j=0;j&lt;=9;++j)
+		{
+			if(i+j&lt;=9)
+			{
+				dp[j][i]=1;
+			}
+			else
+			{
+				dp[j][i]=(dp[0][i+j-10]+dp[1][i+j-10])%1000000007;
+			}
+		}
+	}
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		cin&gt;&gt;n&gt;&gt;m;
+		res=0;
+		while(n)
+		{
+			res=res+dp[n%10][m];
+			res=res%1000000007;
+			n=n/10;
+		}
+		cout&lt;&lt;res&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p>思路1和思路2实际上是差不多的，这道题的关键在于不要考虑加后能得到什么，而是去考虑加后能有多少位，这才是关键，那么关于数字我们只考虑0-9就行，当操作次数会让它升位时，就将它单独列出来，然后第二个思考点就是，如何升位，首先它加到10的时候就会升成2，然后后面如果还需要操作就是对10进行的，那就等价于对0和1进行操作，但此时操作数已经减小，因为要先变成10，对0和1的操作又回到刚刚，操作次数会不会让它升位，不升位就是1，升位就是再对0和1进行操作，操作数进一步减小，依次类推就会发现本质上是不断划分成操作数更小的0和1，然后进行操作。那么实际上我们只考虑对0，1的操作次数就行，然后不断累计,所以由此产生优化：(这样优化后数据范围可以再扩大一点)</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+#define int long long
+using namespace std;
+int t,dp[10][200015],n,m,res;
+signed main()
+{
+	for(int i=0;i&lt;2;++i)
+	{
+		dp[i][0]=1;
+	}
+	//dp[i][j] i表示对哪个数进行操作，j表示操作多少次
+	for(int i=1;i&lt;200010;++i)//操作次数
+	{
+		for(int j=0;j&lt;2;++j)//哪个数
+		{
+			if(i+j&lt;=9)
+			{
+				dp[j][i]=1;
+			}
+			else
+			{
+				dp[j][i]=(dp[0][i+j-10]+dp[1][i+j-10])%1000000007;
+			}
+		}
+	}
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;m);
+		res=0;
+		while(n)
+		{
+			int x=n%10;
+			if(x+m&lt;10) res+=1;
+			else res += (dp[0][x+m-10]+dp[1][x+m-10])%1000000007;
+			res=res%1000000007;
+			n=n/10;
+		}
+		printf(&quot;%d\n&quot;,res);
+	}
+}
+</code></pre>
+<p>思路3：暴力</p>
+<p><a href="https://codeforces.com/contest/1385/problem/D">a-Good String</a><br>
+题目大意：给定一个字符串s,我们定义c-good串：前半段或者后半段是全是字符c,另外半段是c+1-good串，如“cdbbaaaa”：<br>
+cdbb aaaa<br>
+cd bb<br>
+c d<br>
+可以不断分成两段，可发现分成的两段是满足题目要求的。<br>
+我们一次操作可以更改一个字母，我们要求的是将s变成a-good串，最少需要多少次操作。<br>
+思路：这道题很明显是分治，从中间分，不断把子串分小。我们需要修改，从第一次分开始看，第一次分后得到两段，我们需要看看是将前半段统一成a，还是将后半段统一成a,这里有两个需要考虑的因素，一个是前半段需要修改多少个元素，一个是后半段需要修改多少个元素，对每种情况的前后求和，然后取最小值即可，划分之后计算过程一样，那么直接递归调用这个计算函数即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int fz(string s,char c)
+{
+	if(s.size()==1) return s[0]!=c;//等于就返回0，不用更改
+	
+	int mid=s.size()/2;//必须从中间分 abcd n=2^k，那么就是说这里永远是整数
+	int q=fz(string(s.begin(),s.begin()+mid),c+1);//这里s.begin()+mid实际上不会算进前一半
+	q += mid-count(s.begin()+mid,s.end(),c);
+	
+	int h=fz(string(s.begin()+mid,s.end()),c+1);
+	h += mid-count(s.begin(),s.begin()+mid,c);
+	
+	return min(q,h);
+}
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		string s;
+		cin&gt;&gt;n&gt;&gt;s;
+		int ans=fz(s,'a');
+		cout&lt;&lt;ans&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1475/problem/F">Unusual Matrix</a><br>
+题目大意：我们给定一个n阶矩阵，矩阵的元素只含0和1，我们规定两种操作：1.将一整行的数全部取异或；2.将一整列的数全部取异或（异或的意义实际就是将0变成1或者将1变成0）。我们给定两个矩阵a,b；问能否通过操作将a变成b。<br>
+思路：这道题看似麻烦，既要进行行变化又要进行列变化，但实际上行列的变化顺序对结果不产生影响，如果可以就是可以，就那么多操作，操作顺序怎样都可以；如果不可以就是不可以。那么我们只要指定一种操作顺序，然后判断可不可以就行。<br>
+而这里我们指定的操作顺序为：先遍历第一行，如果a，b中对应的元素不相同，那么就将一整列进行操作；遍历结束之后，再遍历第一列，如果对应元素不相同，那么就将对应的一整行进行操作，这样所有的行列都根据要求进行了操作。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a1[2000][2000];
+int b[2000][2000];
+int a2[2000][2000];
+int n;
+int check1()//先进行列变化
+{
+	for(int i=0;i&lt;n;i++)
+	{
+		if(a1[0][i]!=b[0][i])
+		{
+			for(int j=0;j&lt;n;j++)
+			{
+				
+				a1[j][i] ^= 1;
+			}
+		}
+	}
+
+	
+	//行变化
+	for(int i=0;i&lt;n;i++)
+	{
+		int it=(a1[i][0]^b[i][0]);
+		for(int j=1;j&lt;n;j++)
+		{
+			if(it!=(a1[i][j]^b[i][j])) return 0;
+		}
+	}
+	return 1;
+}
+
+int check2()
+{
+
+	for(int i=0;i&lt;n;i++)
+	{
+		if(a2[i][0]!=b[i][0])//遍历第一列
+		{
+			for(int j=0;j&lt;n;j++)
+			{
+				a2[i][j] ^= 1;
+			}
+		}
+	}
+	//列变化
+	for(int i=0;i&lt;n;i++)
+	{
+		int it=(a2[0][i]^b[0][i]);
+		for(int j=1;j&lt;n;j++)
+		{
+			if(it!=(a2[j][i]^b[j][i])) return 0;
+		}
+	}
+	return 1;
+}
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		cin&gt;&gt;n;
+		for(int i=0;i&lt;n;i++)
+		{
+			string s;
+			cin&gt;&gt;s;
+			for(int j=0;j&lt;n;j++)
+			{
+				a1[i][j]=s[j]-'0';
+				a2[i][j]=s[j]-'0';
+			}
+		}	
+		for(int i=0;i&lt;n;i++)
+		{
+			string s;
+			cin&gt;&gt;s;
+			for(int j=0;j&lt;s.size();j++)
+			{
+				b[i][j]=s[j]-'0';
+			}
+		}	
+		
+		if(check1()) printf(&quot;YES\n&quot;);
+	//	else if(check2()) printf(&quot;YES\n&quot;);
+		else printf(&quot;NO\n&quot;);
+	}
+	
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1167/problem/B">Lost Numbers</a><br>
+题目大意：交互题，给定6个数-4,8,15,16,23,42，我们通过4次询问，每次询问可以询问任意两个数的乘积，进而得出它的顺序。<br>
+思路：这道题我们从1开始，每次询问a[i]*a[i+1],然后找出15或者23的位置，然后就可以进一步将前五个数推出，然后再看哪个数没有出现，就将这个数填在第六位。这道题的推理很简单，难点在于交互，交互<br>
+的意思是，由你给输入，但是输入被写在cout区域，oj给出输出，但输出写在cin区。</p>
+<pre><code class="language-cpp">cout&lt;&lt;&quot;?&quot;&lt;&lt;&quot; &quot;&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt; i+1 &lt;&lt;endl;//进行输入
+</code></pre>
+<pre><code class="language-cpp">scanf(&quot;%d&quot;,&amp;ans);//获取系统输出
+</code></pre>
+<pre><code class="language-cpp">fflush(stdout);//刷新输出区
+</code></pre>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int a[]={0,4,8,15,16,23,42};
+	int ans;
+	int res[10];
+	int sres[10];
+	memset(res,-1,sizeof res);
+	memset(sres,-1,sizeof sres);
+	for(int i=1;i&lt;=4;i++)
+	{
+		cout&lt;&lt;&quot;?&quot;&lt;&lt;&quot; &quot;&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;i+1&lt;&lt;endl;
+		fflush(stdout);
+		scanf(&quot;%d&quot;,&amp;ans);
+		res[i]=ans;
+	}
+	int flag=1;
+	for(int i=1;i&lt;4;i++)
+	{
+		if(res[i]%23==0&amp;&amp;res[i+1]%23==0) //23在中间
+		{
+			sres[i+1]=23;
+			sres[i]=res[i]/23;
+			sres[i+2]=res[i+1]/23;
+			int t=i+2;
+			while(t&lt;=4)
+			{
+				sres[t+1]=res[t]/sres[t];
+				t++;
+			}
+			t=i-1;
+			while(t&gt;=1)
+			{
+				sres[t]=res[t]/sres[t+1];
+				t--;
+			}
+			flag=0;
+		}
+		if(res[1]%23==0&amp;&amp;res[2]%23!=0)//23在开头
+		{
+			sres[1]=23;
+			int t=2;
+			while(t&lt;=5)
+			{
+				sres[t]=res[t-1]/sres[t-1];
+				t++;
+			}
+			flag=0;
+		}
+		if(res[i]%15==0&amp;&amp;res[i+1]%15==0) //15在中间
+		{
+			sres[i+1]=15;
+			sres[i]=res[i]/15;
+			sres[i+2]=res[i+1]/15;
+			int t=i+2;
+			while(t&lt;=4)
+			{
+				sres[t+1]=res[t]/sres[t];
+				t++;
+			}
+			t=i-1;
+			while(t&gt;=1)
+			{
+				sres[t]=res[t]/sres[t+1];
+				t--;
+			}
+			flag=0;
+		}
+		if(res[1]%15==0&amp;&amp;res[2]%15!=0)//15在开头
+		{
+			sres[1]=15;
+			int t=2;
+			while(t&lt;=5)
+			{
+				sres[t]=res[t-1]/sres[t-1];
+				t++;
+			}
+			flag=0;
+		}
+	}
+	if(flag)//15和23不在前四个数中
+	{
+	if(res[4]%23==0)
+	{
+		sres[5]=23;
+		int t=4;
+		while(t&gt;=1)
+		{
+			sres[t]=res[t]/sres[t+1];
+			t--;
+		}
+	}
+	if(res[4]%15==0)
+	{
+		sres[5]=15;
+		int t=4;
+		while(t&gt;=1)
+		{
+			sres[t]=res[t]/sres[t+1];
+			t--;
+		}
+
+	}
+	}
+	for(int i=1;i&lt;=6;i++)
+	{
+		if(find(sres+1,sres+6,a[i])==sres+6)
+		{
+			sres[6]=a[i];
+			break;
+		}
+	}
+	cout&lt;&lt;&quot;!&quot;&lt;&lt;&quot; &quot;;
+	for(int i=1;i&lt;=6;i++)
+	{
+		printf(&quot;%d &quot;,sres[i]);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1383/problem/B">GameGame</a><br>
+题目大意:k和朋友做游戏，两人初始分数都是0，现有一个数组a[],他们轮流从a中选一个数，然后用这个数与自己的分数进行异或，最后谁的分高，谁就赢了，如果两人分数相等就平局，问k的状态。<br>
+思路：这道题的核心在与谁的谁的最高位1所在的位数最高（当然这里所说的最高位是从前往后访问，两者不相等的第一位），最开始都是0，所以不影响最高位1，那么我们就统计a[]中每一个数的每一位是否为1，最后得到两个数组，f0[],f1[],表示第i位0或1的个数。然后从前往后访问数组。如果1的个数是偶数，那么一人一半，没什么影响，1<sup>0=1,0</sup>0=0,剩下的0无论怎么分都不影响；假设没有0或者偶数个0，如果1的个数是奇数，如果为3，7，11，……那么一人一个，最后一个肯定分给k，而且此时之前两个人都是1，那么朋友就赢了；如果是5，9，……，那么在分给k之前都是0，那么k胜利；据此写出代码,在循环中判输赢，如果没盘判出来就输出平局。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		int a0[40],a1[40];
+		memset(a0,0,sizeof a0);
+		memset(a1,0,sizeof a1);
+		for(int i=1;i&lt;=n;i++)
+		{
+			int x;
+			scanf(&quot;%d&quot;,&amp;x);
+			for(int j=30;j&gt;=0;j--)
+			{
+				if(x&gt;&gt;j&amp;1) a1[j]++;
+				else a0[j]++;
+			}
+		}
+		int flag=1;
+		for(int i=30;i&gt;=0;i--)
+		{
+			if(a1[i])
+			{
+				if(a1[i]%4==3&amp;&amp;a0[i]%2==0) 
+				{
+					printf(&quot;LOSE\n&quot;);
+					flag=0;
+					break;
+				}
+				else if(a1[i]%2)//如果能整除2，一人一个这样分，最高位相同就没有比较的意义了
+				{
+					printf(&quot;WIN\n&quot;);
+					flag=0;
+					break;
+				}
+				
+			}
+		}
+		if(flag) printf(&quot;DRAW\n&quot;);
+	}
+}
+</code></pre>
+<p>ps:涉及到位运算的题目，就将数视为二进制数来考虑</p>
+<p><a href="https://codeforces.com/contest/1611/problem/D">Weights Assignment For Tree Edges</a><br>
+题目大意：给定一个数组b[],b[i]表示i的父节点；我们要赋一个dist[]数组，dist[i]表示从根节点到i路径上所有点的点权和，要求dist[root]=0,同时给定一个数组p[],要求dist[p[i]]&lt; dist[p[i+1]]，最后输出每个点的点权。<br>
+思路：按照dist[]的定义，一定可以得到dist[父]小于dist[子]，我们按照p[]的顺序来给dist[]赋值，在赋值之前判断一下它的父节点的dist有没有被赋值，如果没被赋值，那么就直接输出-1，因为如果父在p中的位置在子后面，赋到的值就比子大，是不符合dist定义的。在输出点权的时候，我们对于每个点只要输出dist[父]-dist[i]就可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int b[200010],p[200010],dist[200010];
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;b[i]);
+		for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;p[i]);
+		memset(dist,-1,sizeof dist);
+		if(p[1]!=b[p[1]])//因为要按照p的顺序来赋值，所以p[1]必须是根节点
+		{
+			printf(&quot;-1\n&quot;);
+			continue;
+		}
+		dist[p[1]]=0;
+		int flag=1;
+		for(int i=2;i&lt;=n;i++)
+		{
+			if(dist[b[p[i]]]==-1) 
+			{
+				printf(&quot;-1\n&quot;);
+				flag=0;
+				break;
+			}
+			dist[p[i]]=dist[p[i-1]]+1;
+		}
+		if(flag) 
+		{
+			for(int i=1;i&lt;=n;i++)
+			{
+				printf(&quot;%d &quot;,dist[i]-dist[b[i]]);
+			}
+			printf(&quot;\n&quot;);
+		}
+		
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1334/problem/C">Circle of Monsters</a><br>
+题目大意：n个角色，站成一圈，每个角色的血量为a，它死后会对下一个角色产生b的暴击，我们每次开枪只能对一个角色产生一点伤害，我们要求至少需要开几枪可以杀死所有角色。<br>
+思路：这道题是贪心题，思路比较巧，我们将一个角色的血量分成两部分，一部分是被暴击所伤的，一部分是需要补的枪数，如果被暴击所伤的大于自己的血量就不用补枪。我们考虑两种极端的情况，全都可以被暴击杀死，那么总的补枪数就是0，我们只要挑一个血量最少的开枪，就是最小开枪数；全都不能被暴击杀死，那么补枪数累加之后再加上最小暴击就可，因为它需要补枪的那一部分已经被考虑了，再加上暴击就可以杀死第一个，触发暴击。核心在于，第一个杀谁。<br>
+<img src="https://s111z.github.io/post-images/1698336859626.png" alt="" loading="lazy"><br>
+由上图，所有怪兽都分为以上两种情况，然后对于第一个打的一定是二选一的，选第一个就要打a[i]枪，选后一个就要打b[i]枪，肯定选小的。</p>
+<pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
+using namespace std;
+#define forn(i, n) for (int i = 0; i &lt; int(n); ++i)
+typedef long long li;
+const int N = 300 * 1000 + 13;
+int n;
+li a[N], b[N];
+void solve() 
+{
+	scanf(&quot;%d&quot;, &amp;n);
+	forn(i, n) scanf(&quot;%lld%lld&quot;, &amp;a[i], &amp;b[i]);//a是血量，b是暴击伤害
+	li ans = 0, mn = 1e18;
+	forn(i, n)//[0,n-1] 
+	{
+		int ni = (i + 1) % n;//算下一个是谁
+		li val = min(a[ni], b[i]);//下一个的血量和当前这个的暴击去min
+		ans += a[ni] - val;
+		//a[ni]&gt;=b[i],val=b[i],打完当前这个要打死下一个还需要几枪
+		//a[ni]&lt;b[i],打下个需要补0枪
+		mn = min(mn, val);
+		//val全等于a[ni],只要打死一个，就全死了，那就打死a[i]最小的即可
+		//全为b[i]的话，补枪全部已经算上，但是第一个的暴击无处可来，但是它的a已经被加了一部分了，剩下一部分就是它被暴击的，我们再加上即可
+		//混合其实同理，每一个都分为被暴击和补枪两部分，
+		//val=a[ni]就是说，可以被暴击杀死，但是暴击可能不会被触发，那么就需要手动开枪
+		//val=b[ni]就是说，不能被暴击杀死，需要补枪，但补枪部分同一加了，也是可能无法开始暴击，需要手动开枪
+		//但是a[ni]的其中一部分已经被加上了，只用把另一部分加上即可，这部分刚好是暴击。4
+	}
+	ans += mn;
+	printf(&quot;%lld\n&quot;, ans);
+}
+
+int main() {
+	int T;
+	scanf(&quot;%d&quot;, &amp;T);
+	forn(i, T)
+		solve();
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[ACM训练计划]]></title>
+        <id>https://s111z.github.io/post/acm-xun-lian-ji-hua/</id>
+        <link href="https://s111z.github.io/post/acm-xun-lian-ji-hua/">
+        </link>
+        <updated>2023-10-23T11:48:05.000Z</updated>
+        <content type="html"><![CDATA[<p>时间安排：<br>
+周一休息<br>
+周二、周三：完成ACDC 10道题并写出题解<br>
+周四、周五：专题模板练习（总结模板）<br>
+周六、周日：一场cf模拟、一场女生赛模拟</p>
+<p>专题顺序：<br>
+一、基础算法<br>
+排序<br>
+二分<br>
+高精度<br>
+前缀和与差分<br>
+双指针算法<br>
+位运算<br>
+离散化<br>
+区间合并</p>
+<p>二、数据结构<br>
+链表与邻接表：树与图的存储<br>
+栈与队列：单调队列、单调栈<br>
+kmp<br>
+Trie<br>
+并查集<br>
+堆<br>
+Hash表</p>
+<p>三、搜索与图论<br>
+DFS与BFS<br>
+树与图的遍历：拓扑排序<br>
+最短路<br>
+最小生成树<br>
+二分图：染色法、匈牙利算法</p>
+<p>四、数学知识<br>
+质数<br>
+约数<br>
+欧拉函数<br>
+快速幂<br>
+扩展欧几里得算法<br>
+中国剩余定理<br>
+高斯消元<br>
+组合计数<br>
+容斥原理<br>
+简单博弈论</p>
+<p>五、动态规划<br>
+背包问题<br>
+线性DP<br>
+区间DP<br>
+计数类DP<br>
+数位统计DP<br>
+状态压缩DP<br>
+树形DP<br>
+记忆化搜索</p>
+<p>六、贪心</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Codeforces Round 905 (Div. 3)]]></title>
+        <id>https://s111z.github.io/post/codeforces-round-905-div-3/</id>
+        <link href="https://s111z.github.io/post/codeforces-round-905-div-3/">
+        </link>
+        <updated>2023-10-22T15:40:43.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://codeforces.com/contest/1883/problem/A">Morning</a><br>
+题目大意：键盘上的数按照“1234567890”排列，每次只能进行移动光标或者选择这两种操作之一，求输入一个四位数的PIN码至少需要操作多少次。（光标最开始在1处）<br>
+思路：就是个模拟题，思路很简单，将PIN码转化成int[]，用一个变量来表示光标当前位置，然后遍历int[]即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		string s;
+		cin&gt;&gt;s;
+		int a[5];
+		for(int i=0;i&lt;s.size();i++)
+		{
+			if(s[i]=='0') a[i]=10;
+			else
+			a[i]=s[i]-'0';
+		}
+		int c=0,k=1;
+		for(int i=0;i&lt;4;i++)
+		{
+			c += abs(a[i]-k)+1;
+			k=a[i];
+		}
+		cout&lt;&lt;c&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1883/problem/B">Chemistry</a><br>
+题目大意：给定一个长为n的字符串s和一个整数k，问能否在恰好删除k个字符的情况下，使s删除重排后为回文串，空字串也是回文串。<br>
+思路：这题的核心在于字符串中每个字符出现次数的奇偶性，最多只能有一个为奇数，那那么只用统计字符数为奇数的有多少个，个数&lt;=k，就可以，因为个数小于等于k就可以将所有字符的个数都变成偶数，那么此时（k-个数）为奇数还是为偶数都可以成立；个数==k+1其实也可，删完只留一个，为奇数的，也可以构成回文串；个数&gt;k+1的话，删完至少剩俩为奇数的，一定不可以。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+    int t;
+    cin&gt;&gt;t;
+    while(t--)
+    {
+        int n,k;
+        string s;
+        scanf(&quot;%d%d&quot;,&amp;n,&amp;k);
+        cin&gt;&gt;s;
+        map&lt;char,int&gt;mp;
+        for(int i=0;i&lt;s.size();i++) mp[s[i]]++;
+        int c=0;
+        for(auto it:mp)
+        {
+            if(it.second%2) c++;
+        }
+        if(c&gt;k+1) printf(&quot;NO\n&quot;);
+        else printf(&quot;YES\n&quot;);
+    }
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1883/problem/C">Raspberries</a><br>
+题目大意：我们给定一个数组a，对于一个操作，就是挑一个ai,然后ai++;我们给定一个数k，要求至少操作多少次，使得最后ai的的乘积可以整除k；<br>
+思路：实际上很简单，2&lt;=k&lt;=5,想要整除，数组中一定有能够整除它的数，我们只用写一个循环，计算出每一个数要想整除它需要操作多少次，取最小值即可，另外对于4，单独处理一下，因为数组中如果</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Codeforces Round 904 (Div. 2)]]></title>
+        <id>https://s111z.github.io/post/codeforces-round-904-div-2/</id>
+        <link href="https://s111z.github.io/post/codeforces-round-904-div-2/">
+        </link>
+        <updated>2023-10-22T09:58:20.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://codeforces.com/contest/1884/problem/A">Simple Design</a><br>
+题目大意：给定一个数x和k，要求出最小的y&gt;=x,使y的各个位数上的和可以整除k。（k&lt;=10）<br>
+思路：这道题看似麻烦，但实际很简单，因为求的是各个数位上的和，所以我们可以一个一个在x的基础上进行累增，而且因为k&lt;=10,所以不用累增太多就可以找到目标值。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int get(int k)
+{
+	int c=0;
+	while(k)
+	{
+		c += k%10;
+		k /= 10;
+	}
+	return c;
+}
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int x,k;
+		scanf(&quot;%d%d&quot;,&amp;x,&amp;k);
+		for(int i=x;i;i++)
+		{
+			int c=get(i);
+			if(c%k==0)
+			{ 
+				printf(&quot;%d\n&quot;,i);
+				break;
+			}
+			else 
+			{
+				int it=i;
+				while(get(it)%k!=0) it ++;
+				cout&lt;&lt;it&lt;&lt;endl;
+				break;
+			}
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1884/problem/B">Haunted House</a><br>
+题目大意：给定一个数n，和一个长为n的二进制数，我们每次可以交换相邻的两个数，最终需要判断能否通过交换使得到的数能够整除2^i（1&lt;=i&lt;=n），如果不能，则输出-1。<br>
+思路：能够整除2，那么末位是0即可，能够整除4，则后两位为0，能整除8，就是后三位为0；依次类推，我们可以发现，只用统计二进制数中有多少个0，即可依次判断能否整除2的多少次方。至于交换，将前面的数换到后面来，无论多少个数，无论怎么换，实际上都到最后几个的话是等价的，那么我们对交换进行累计即可。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+signed main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%lld&quot;,&amp;n);
+		string s;
+		cin&gt;&gt;s;
+		int c=0;
+		vector&lt;int&gt;p;
+		for(int i=0;i&lt;s.size();i++)
+		{
+			if(s[i]=='0') c++,p.push_back(i);
+		}
+		reverse(p.begin(),p.end());
+		//移动是等价的,移到到s.size()-1
+		int cnt=0;
+		for(int i=1;i&lt;=n;i++)
+		{
+			if(p.size()&gt;=i)
+			{
+				cnt += s.size()-i-p[i-1];
+                //一定要注意，这里可能爆int，要用long long类型
+				cout&lt;&lt;cnt&lt;&lt;&quot; &quot;;
+			}
+			else printf(&quot;-1 &quot;);
+		}
+		cout&lt;&lt;endl;
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1884/problem/C">Medium Design</a><br>
+题目大意：给定n,m；n表示有多少个可操作子区间，m表示整个区间的长度（区间初值为0），我们对于每个可操作子区间可以选择将子区间内的所有数都加1，也可以不对该子区间进行操作。我们要求最后整个区间中最大值-最小值为多少。<br>
+思路：这道题的第一个难点就是找出区间重叠最多的位置重叠了多少个区间，这里有个很精妙的算法，扫描算法：</p>
+<pre><code class="language-cpp">vector&lt;pair&lt;int,int&gt;&gt;p;
+for(int i~)
+{
+    cin&gt;&gt;x&gt;&gt;y;
+    p.push_back({x,1});
+    p.push_back({y+1,-1});
+}
+sort(p.begin(),p.end());
+int c=0,mx=0;
+for(auto t:p)
+{
+    if(t.second==1) c++;
+    else c--;
+    mx=max(mx,c);
+}
+</code></pre>
+<p>这里wo'men'j</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[cf1300练习]]></title>
+        <id>https://s111z.github.io/post/cf1300-lian-xi/</id>
+        <link href="https://s111z.github.io/post/cf1300-lian-xi/">
+        </link>
+        <updated>2023-10-22T02:01:46.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://codeforces.com/problemset/problem/1560/D">Make a Power of Two</a><br>
+题目大意：给定一个数字，我们可以对其进行两个操作:<br>
+1.在其左右添加字符<br>
+2.从任意位置抹掉字符<br>
+我可进行任意次操作，要使操作后的数是2的任意次幂。<br>
+思路：这道题在看到这两个操作的时候就应该与字符串匹配联系起来，事实上，确实是字符串匹配，我们将数字转化成字符串，预处理出来2的任意次幂对应的字符串，然后进行匹配，取最小值即可。另外要注意，2的幂最好处理的大一点。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+string s[100];
+#define int long long
+string zh(int m)
+{
+	string s;
+	while(m)
+	{
+		s+=m%10+'0';
+		m /= 10;
+	}
+	reverse(s.begin(),s.end());
+	return s;
+}
+signed main()
+{
+	int t=1ll;
+	int k=0;
+	while(1)
+	{
+		s[k++]=zh(t);
+		if(t&gt;2e18) break;
+		t *= 2;
+	}
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n;
+		cin&gt;&gt;n;
+		string s1=zh(n);
+		int mi=100000000;
+		for(int i=0;i&lt;k;i++)
+		{
+			int x=0,y=0,c=0;
+			while(x&lt;s1.size()&amp;&amp;y&lt;s[i].size())
+			{
+				if(s1[x]==s[i][y]) c++,y++;
+				x++;
+				//s1会被遍历，因为其中和s[i]不等的字符会被擦掉
+			}
+			c = s1.size()-c+s[i].size()-c;
+			//s1.size()是被擦掉的字符，s[i].size()-c是要添加的字符
+			mi=min(mi,c);
+		}
+		cout&lt;&lt;mi&lt;&lt;endl;;
+	}
+}
+</code></pre>
+<p>上述代码中的zh()还可被替换成to_string()<br>
+ps:string s[]与vector<string>类似</p>
+]]></content>
+    </entry>
+</feed>

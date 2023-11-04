@@ -1,0 +1,438 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Codeforces Round 902 (Div. 2, based on COMPFEST 15 - Final Round)题解 | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Codeforces Round 902 (Div. 2, based on COMPFEST 15 - Final Round)题解
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-10-11 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <p><a href="https://codeforces.com/contest/1877/problem/A"> Goals of Victory</a><br>
+题目大意：足球比赛，有n支队伍，两两对战一场，我们定义一个队伍的每场的效率为进球数-对手进球数，总效率为每场效率和，现给出1~n-1个队伍的总效率，要求出第n支队伍的总效率。<br>
+思路：<br>
+我们可以发现两队对战，如果比分为2：3，那么效率就分别为-1和1，<br>
+如果比分为a:b，那么效率就为a-b和b-a,和一定为0，所以可得所有效率的和为0；<br>
+那么将已经给出的加起来得到sum，那么ans=0-sum</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	cin&gt;&gt;t;
+	while(t--)
+	{
+		int n;
+		scanf(&quot;%d&quot;,&amp;n);
+		int ans=0;
+		n--;
+		while(n--)
+		{
+			int num;
+			scanf(&quot;%d&quot;,&amp;num);
+			ans += num;
+		}
+		printf(&quot;%d\n&quot;,0-ans);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1877/problem/B">Helmets in Night Light</a><br>
+题目大意：一个村庄除了Pak Chanek还有n个人，有个消息需要通知到所有人，pak可以通知任意多个人，通知每个人的成本为p,第i个人，可以通知ai个人，通知每个人的成本为bi,先要求通知到所有人的最小成本。<br>
+思路：首先被选中通知其他人的人，所需要的花费bi一定要小于p,如果不存在这样的bi，就没必要让别人去通知，pak自己通知即可。如果有，就让这些人去通知，最关键的一点就是，通知了第一个人，这个人可以去通知合法的第二个人，要考虑到这一点,并不是所有合法的都由pak来通知，没必要。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+struct cm
+{
+	int a,b;
+}s[100010];
+bool cmp(cm x,cm y)
+{
+	return x.b&lt;y.b;
+}
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,p;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;p);
+		for(int i=0;i&lt;n;i++)
+		{
+			int a;
+			scanf(&quot;%d&quot;,&amp;a);
+			s[i].a=a;
+		}
+		int cnt=0;//有cnt个人小于p
+		int tz=0;//这些人总共可以通知多少人
+		for(int i=0;i&lt;n;i++)
+		{
+			int b;
+			scanf(&quot;%d&quot;,&amp;b);
+			s[i].b=b;
+			if(b&lt;p)cnt++,tz += s[i].a;
+		}
+		sort(s,s+n,cmp);
+		long long ans=0;
+		if(s[0].b&gt;p)
+		{
+			ans = (long long)p*n;
+		}
+		else
+		{
+			ans += (long long)p;
+			int c=1;//已经被通知的人
+			for(int i=0;i&lt;n;i++)
+			{
+				
+				int a=s[i].a,b=s[i].b;//a是可以通知的人，b是费用
+				if(b&lt;p)
+				{
+					if(i&lt;c)//说明这个人被通知了
+					{
+						if(n-c&gt;=a)//如果剩下的多于a
+						{
+						c += a;
+						ans += (long long)a*b;
+						}
+						else 
+						{
+						
+						ans += (long long)b*(n-c);
+						c=n;
+						break;
+						}
+					}
+                    
+					else//这个其实不会执行，因为每个人至少可以通知一个人，所以每次访问到的合法的bi，对应的这个人是一定已经被通知到的，大不了就是上一个人只传给它
+					{
+						ans += (long long)p;
+						c++;
+					}
+				}
+				else break;
+			}
+			if(c!=n)
+			{
+				ans += (long long)p*(n-c);
+			}
+		}
+		printf(&quot;%lld\n&quot;,ans);
+	}
+	
+}
+</code></pre>
+<p>优化如下:</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+struct cm
+{
+	int a,b;
+}s[100010];
+bool cmp(cm x,cm y)
+{
+	return x.b&lt;y.b;
+}
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,p;
+		scanf(&quot;%d%d&quot;,&amp;n,&amp;p);
+		for(int i=0;i&lt;n;i++)
+		{
+			int a;
+			scanf(&quot;%d&quot;,&amp;a);
+			s[i].a=a;
+		}
+		int cnt=0;//有cnt个人小于p
+		int tz=0;//这些人总共可以通知多少人
+		for(int i=0;i&lt;n;i++)
+		{
+			int b;
+			scanf(&quot;%d&quot;,&amp;b);
+			s[i].b=b;
+			if(b&lt;p)cnt++,tz += s[i].a;
+		}
+		sort(s,s+n,cmp);
+		long long ans=0;
+		if(s[0].b&gt;p)
+		{
+			ans = (long long)p*n;
+		}
+		else
+		{
+			ans += (long long)p;
+			int c=1;//已经被通知的人
+			for(int i=0;i&lt;n;i++)
+			{
+				
+				int a=s[i].a,b=s[i].b;//a是可以通知的人，b是费用
+				if(b&lt;p)
+				{
+						if(n-c&gt;=a)//如果剩下的多于a
+						{
+						    c += a;
+						    ans += (long long)a*b;
+						}
+						else 
+						{
+						    ans += (long long)b*(n-c);
+						    c=n;
+						    break;
+						}
+				}
+				else break;
+			}
+			if(c!=n)
+			{
+				ans += (long long)p*(n-c);
+			}
+		}
+		printf(&quot;%lld\n&quot;,ans);
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1877/problem/C">Joyboard</a><br>
+题目大意：有个长为n+1的数组a ，我们先从1-m中选一个数放在a[n+1]上，然后a[i]=a[i+1]%i得到数组a，问有多少种选法使数组中只有k类数。<br>
+思路：我们多写几个样例可以发现最多只会出现3类数：<br>
+1类数：选0<br>
+2类数：选[1,n]或者选x属于[n+1,m]，x%n== 0<br>
+3类数：选x属于[n+1,m]，同时x%n!=0<br>
+因为我们可以发现一旦某一位上为0后，剩下的都为0，所以核心在于0出现的位置如果0出现在n+1上，那么就全为0，如果出现在第n位，那么就是两类数，如果出现在1~(n-1)中，就要看，n与n+1位上的数是否相同，相同就是两类，不同就是三类，如果a[n+1]%n==a[n+1],那么a[n+1]&lt;n，否则就是大于等于(n+1)才能取到。</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int main()
+{
+	int t;
+	scanf(&quot;%d&quot;,&amp;t);
+	while(t--)
+	{
+		int n,m,k;
+		scanf(&quot;%d%d%d&quot;,&amp;n,&amp;m,&amp;k);
+		if(m&gt;n)
+		{
+			int tw=0;
+			if(k==1) printf(&quot;1\n&quot;);
+			else if(k==2)
+			{
+				tw=m/n+(n-1);
+				printf(&quot;%d\n&quot;,tw);
+			}
+			else if(k==3)
+			{
+				tw=m/n+(n-1)+1;
+				int res=m+1-tw;
+				printf(&quot;%d\n&quot;,res);
+			}
+			else printf(&quot;0\n&quot;);
+		}
+		else if(m==n)
+		{
+			if(k==1) printf(&quot;1\n&quot;);
+			else if(k==2) printf(&quot;%d\n&quot;,n);
+			else printf(&quot;0\n&quot;);
+		}
+		else
+		{
+			if(k==1) printf(&quot;1\n&quot;);
+			else if(k==2) printf(&quot;%d\n&quot;,m);
+			else printf(&quot;0\n&quot;);
+		}
+	}
+}
+</code></pre>
+<p><a href="https://codeforces.com/contest/1877/problem/D">Effects of Anti Pimples</a><br>
+题目大意：最初所有元素都是白色，现挑出任意个元素，染成黑色，然后将这些元素对应下标的倍数的下标对应的元素染成绿色，然后此种选法的值为黑色和绿色的值的最大值。求出所有选法的最大值的和sum，sum%998244353.<br>
+思路：我们可以新开一个数组s[]，来表示，每个值被选到且只选该元素时的最大值，因为后面的会影响前面的，所以我们倒序访问原数组，进行更新。然后组合时，我们可以发现，如果一个数最大，那么这个数会出现在2<sup>(n-1)种选择中(该元素一定被选，剩下的有选与不选两种情况)，如果第二大，那么就有2</sup>(n-2)种情况，以此类推。<br>
+更新s[i]数组时可以加入三个优化：<br>
+1.n-i&gt;=i,这个条件如果为真，那么说明i的倍数已经被访问过了，需要比较一下谁更大，否则直接s[i]=a[i]即可<br>
+2.访问倍数时只访问质数倍，因为合数倍一定可以去更新某个两个质数倍，所以考虑质数倍即可<br>
+3.用线性筛法求出1-n中的质数<br>
+另外结果计算引入快速幂求2^()</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[100010],s[100010];
+int st[100010];
+const int mod=998244353;
+int qmi(int a,int b)
+{
+	int res = 1 % mod, t = a;
+    while (b)
+    {
+        if (b&amp;1) res = (long long)res * t % mod;
+        t = (long long)t * t % mod;
+        b &gt;&gt;= 1;
+    }
+    return res;
+}
+bool cmp(int a,int b)
+{
+	return a&gt;b;
+}
+int main()
+{
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	
+	vector&lt;int&gt;p;
+	//p装奇数 1-100010
+	for (int i = 2; i &lt;= n; i ++ )
+    {
+        if (!st[i]) p.push_back(i); 
+        for(auto it:p)
+        {
+        	if(it&gt;n/i) break;
+        	st[it*i] = true;
+        	if(i%it==0) break;
+		}
+    }
+    cout&lt;&lt;*p.rbegin();
+	//cout&lt;&lt;p.size();
+	int mx=0;
+	for(int i=1;i&lt;=n;i++) scanf(&quot;%d&quot;,&amp;a[i]),mx=max(mx,a[i]);
+	s[1]=mx;
+	for(int i=n;i&gt;=2;i--)
+	{
+		if(n-i&gt;=i)//访问过i的倍数,只看奇数倍即可
+		{
+			s[i]=a[i];
+			for(auto it:p)
+			{
+				int tp=i*it;
+				if(tp&gt;n) break;
+				else
+				{
+					s[i]=max(s[i],s[tp]);
+				}
+			}
+		}
+		else//没访问过i的倍数
+		{
+			s[i]=a[i];
+		}
+	}
+	sort(s+1,s+1+n,cmp);
+	long long ans=0;
+	for(int i=1;i&lt;=n;i++)
+	{
+		ans += (long long)s[i]*qmi(2,n-i);
+		ans %= mod;
+	}
+	cout&lt;&lt;ans;
+	
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/acdc14/">
+              <h3 class="post-title">
+                ACDC14
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>

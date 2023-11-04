@@ -1,0 +1,163 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>树形dp | Gridea</title>
+<link rel="shortcut icon" href="https://s111z.github.io/favicon.ico?v=1699081854354">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="stylesheet" href="https://s111z.github.io/styles/main.css">
+
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script src="https://cdn.bootcss.com/moment.js/2.23.0/moment.min.js"></script>
+
+<!-- DEMO JS -->
+<script src="/media/scripts/index.js"></script>
+
+
+
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://s111z.github.io">
+  <img class="avatar" src="https://s111z.github.io/images/avatar.png?v=1699081854354" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+  <form id="gridea-search-form" action="https://s111z.github.io/search/">
+    <input name="q" />
+  </form>
+</div>
+
+      
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              树形dp
+            </h2>
+            <div class="post-info">
+              <time class="post-time">
+                · 2023-09-18 ·
+              </time>
+              
+            </div>
+            
+            <div class="post-content">
+              <h3 id="没有上司的舞会">没有上司的舞会</h3>
+<p>关键：每个人不能与直属上级一起工作</p>
+<p>思路：</p>
+<p>状态表示：定义一个二维数组f[i][2],第一维表示第i个节点，第二维,0表示第i个节点不选，1表示第i个节点选，数组的值用来存当前的最大幸福度。</p>
+<p>状态计算：当前节点没选时，她的下级选与不选都可，我们找出最大值即可，那么就是 f[i][0]=sum(max(f[j][0],f[j][1]))(j是i的子节点)<br>
+当前节点选的时候，其子节点一定不能选f[i][1]=sum(f[j][0]);</p>
+<p>代码：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int a[7000],f[7000][2];
+vector&lt;int&gt;d[7000];
+int n;
+bool hb[7000];
+void dfs(int k)
+{
+    f[k][1] = a[k];//当这个点被选时，首先要加上它本身
+    for(auto it:d[k])
+    {
+        dfs(it);//处理子节点
+        f[k][0] += max(f[it][0],f[it][1]);//dp
+        f[k][1] += f[it][0];//dp
+    }
+}
+int main()
+{
+    scanf(&quot;%d&quot;,&amp;n);
+    for(int i=1;i&lt;=n;i++)
+        scanf(&quot;%d&quot;,&amp;a[i]);
+        
+    for(int i=1;i&lt;n;i++)
+    {
+        int l,k;
+        scanf(&quot;%d%d&quot;,&amp;l,&amp;k);
+        d[k].push_back(l);//将l放进k中，相当于建立邻接表
+        hb[l]=true;//这步标记l已经有父节点了
+    }
+    int root=1;
+    while(hb[root]!=false) root++;//找根节点
+    dfs(root);
+    printf(&quot;%d&quot;,max(f[root][0],f[root][1]));
+}
+</code></pre>
+
+            </div>
+          </article>
+        </div>
+    
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://s111z.github.io/post/zhuang-tai-ya-suo-dp/">
+              <h3 class="post-title">
+                状态压缩dp
+              </h3>
+            </a>
+          </div>  
+        
+
+        
+    
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+</div>
+
+<script>
+  hljs.initHighlightingOnLoad()
+</script>
+
+      </div>
+    </div>
+  </body>
+</html>
